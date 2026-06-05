@@ -197,6 +197,10 @@ def index():
     """提供前端 HTML 頁面"""
     return send_from_directory(".", "index.html")
 
+@app.route("/audio/<path:filename>")
+def serve_audio(filename):
+    return send_from_directory(".", filename)
+
 
 @app.route("/api/map-data")
 def get_map_data():
