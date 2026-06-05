@@ -300,14 +300,26 @@ function flames(n, cls) {
 // ════════════════════════════════════════════════
 
 // ── TTS 狀態 ─────────────────────────────────────
-let ttsState       = 'idle';   // 'idle' | 'playing' | 'paused'
-let ttsUtterance   = null;
+let ttsState        = 'idle';  // 'idle' | 'playing' | 'paused'
+let ttsUtterance    = null;
 let ttsCurrentStory = null;
-let ttsResumeTimer = null;     // Chrome Bug Workaround 用
+let ttsResumeTimer  = null;    // Chrome Bug Workaround 用
+let ttsVoices       = [];      // 預載語音清單快取
 
 // ── TTS 支援偵測 ─────────────────────────────────
 function isTTSSupported() {
   return 'speechSynthesis' in window;
+}
+
+// ── 預載語音清單（非同步，頁面啟動時就開始）────────
+// Chrome / Edge 的語音清單是非同步載入的，
+// 必須監聽 voiceschanged 才能確保拿到完整清單。
+function _loadVoices() {
+  ttsVoices = speechSynthesis.getVoices();
+}
+if (isTTSSupported()) {
+  speechSynthesis.addEventListener('voiceschanged', _loadVoices);
+  _loadVoices(); // 部分瀏覽器同步就有，先呼叫一次
 }
 
 /**
@@ -327,9 +339,17 @@ function speakStory(s) {
 
   ttsUtterance          = new SpeechSynthesisUtterance(text);
   ttsUtterance.lang     = 'zh-TW';
-  ttsUtterance.rate     = 0.82;  // 比正常稍慢，強化鬼故事氛圍
-  ttsUtterance.pitch    = 0.88;  // 略為低沉
+  ttsUtterance.rate     = 0.75;
+  ttsUtterance.pitch    = 0.5;
   ttsUtterance.volume   = 1.0;
+  // 優先序：Windows Yating → macOS Meijia → 任何 zh-TW → 任何中文 → 系統預設
+  // ttsVoices 已在頁面啟動時由 voiceschanged 事件預載，確保這裡能拿到完整清單
+  ttsUtterance.voice =
+    ttsVoices.find(v => v.name === 'Microsoft Yating - Chinese (Traditional, Taiwan)') ||
+    ttsVoices.find(v => v.name === 'Meijia') ||
+    ttsVoices.find(v => v.lang === 'zh-TW') ||
+    ttsVoices.find(v => v.lang.startsWith('zh')) ||
+    null;
 
   ttsUtterance.onstart = () => {
     ttsState = 'playing';
