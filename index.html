@@ -128,6 +128,22 @@ main { flex: 1; overflow: hidden; display: grid; grid-template-columns: 420px 1f
 .d-warn-icon { flex-shrink: 0; font-size: 13px; color: var(--gold); margin-top: 2px; }
 .d-warn-text { font-size: 11px; color: rgba(201,146,42,.65); letter-spacing: .06em; line-height: 1.75; }
 
+/* ── [新增] 已讀標記 ── */
+.sc-read-tag { font-family: var(--mono); font-size: 8px; border: 1px solid var(--red); padding: 2px 5px; color: var(--red); background: rgba(139,0,0,.1); white-space: nowrap; flex-shrink: 0; letter-spacing: .04em; }
+
+/* ── [新增] 閱覽紀錄（detailEmpty 內） ── */
+.hist-wrap { width: 100%; padding: 0 22px 20px; }
+.hist-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.hist-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: .15em; }
+.hist-clear { font-family: var(--mono); font-size: 9px; color: var(--muted); background: transparent; border: none; cursor: pointer; letter-spacing: .07em; transition: color .2s; padding: 0; }
+.hist-clear:hover { color: var(--red); }
+.hist-item { padding: 8px 10px; border: 1px solid transparent; cursor: pointer; transition: all .2s; margin-bottom: 3px; display: flex; flex-direction: column; gap: 4px; }
+.hist-item:hover { background: var(--bg-hover); border-color: var(--border); }
+.hist-item-title { font-size: 12px; font-weight: 700; color: var(--text); letter-spacing: .04em; line-height: 1.4; }
+.hist-item-meta { display: flex; align-items: center; gap: 6px; }
+.hist-item-county { font-size: 10px; color: var(--muted); }
+.hist-item-time { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-left: auto; }
+
 /* ── [新增] TTS 語音朗讀控制列 ── */
 .d-tts {
   display: flex;
@@ -261,9 +277,7 @@ footer p + p { margin-top: 2px; opacity: .55; }
     <!-- 故事詳情 -->
     <div class="story-detail" id="storyDetail">
       <div class="detail-empty" id="detailEmpty">
-        <div class="skull">☠</div>
-        <h3>未翻開卷軸</h3>
-        <p>請點選地圖上的縣市，<br>再從上方故事清單中選擇一則異事錄。</p>
+        <!-- 由 renderHistory() 動態填入 -->
       </div>
       <div class="detail-inner" id="detailInner" style="display:none;"></div>
     </div>
@@ -293,6 +307,114 @@ function flames(n, cls) {
   return Array.from({length:5}, (_,i) =>
     `<span class="${cls}${i<n?' lit':''}">${i<n?'🔥':'🔥'}</span>`
   ).join('');
+}
+
+// ════════════════════════════════════════════════
+//  ██████╗ 閱覽紀錄模組（localStorage）
+// ════════════════════════════════════════════════
+
+const HISTORY_KEY = 'ghost_story_history';
+const HISTORY_MAX = 20;
+
+/** 從 localStorage 取出紀錄陣列 */
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
+  catch { return []; }
+}
+
+/** 新增一筆閱覽紀錄（同一則故事只保留最新一次） */
+function addToHistory(s) {
+  const countyName = $('focusName').textContent || '';
+  let hist = getHistory().filter(item => item.id !== s.id);
+  hist.unshift({
+    id:         s.id,
+    title:      s.title,
+    countyId:   s.countyId   || currentCountyId,
+    countyName: countyName,
+    tag:        s.tag,
+    timestamp:  Date.now()
+  });
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(hist.slice(0, HISTORY_MAX)));
+}
+
+/** 清除全部紀錄 */
+function clearHistory() {
+  localStorage.removeItem(HISTORY_KEY);
+  renderHistory();
+  // 重新渲染故事卡，清掉已讀小點
+  const filtered = selectedTag
+    ? currentStories.filter(s => s.tag === selectedTag)
+    : currentStories;
+  renderStoryList(filtered);
+}
+
+/** 判斷某則故事是否已讀 */
+function isRead(id) {
+  return getHistory().some(item => item.id === id);
+}
+
+/** 把時間戳轉成人性化文字 */
+function formatTime(ts) {
+  const diff = (Date.now() - ts) / 1000;
+  if (diff < 60)    return '剛才';
+  if (diff < 3600)  return `${Math.floor(diff / 60)} 分鐘前`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} 小時前`;
+  const d = new Date(ts);
+  return `${d.getMonth() + 1}/${d.getDate()}`;
+}
+
+/** 渲染閱覽紀錄到 detailEmpty 區塊 */
+function renderHistory() {
+  const el   = $('detailEmpty');
+  const hist = getHistory();
+
+  if (!hist.length) {
+    // 沒有紀錄：顯示原始提示
+    el.style.justifyContent = 'center';
+    el.style.alignItems     = 'center';
+    el.innerHTML = `
+      <div class="skull">☠</div>
+      <h3>未翻開卷軸</h3>
+      <p>請點選地圖上的縣市，<br>再從上方故事清單中選擇一則異事錄。</p>
+    `;
+    return;
+  }
+
+  // 有紀錄：頂部小提示 + 紀錄列表
+  el.style.justifyContent = 'flex-start';
+  el.style.alignItems     = 'stretch';
+  el.innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 22px 14px;flex-shrink:0;border-bottom:1px solid var(--border)">
+      <div class="skull" style="font-size:26px">☠</div>
+      <p style="font-size:11px;color:var(--muted);letter-spacing:.08em;margin:0">點選地圖繼續探索</p>
+    </div>
+    <div class="hist-wrap" style="overflow-y:auto;flex:1">
+      <div class="hist-hd">
+        <span class="hist-label">RECENT_READS ·  ${hist.length} 則</span>
+        <button class="hist-clear" onclick="clearHistory()">清除紀錄</button>
+      </div>
+      ${hist.slice(0, 10).map(item => `
+        <div class="hist-item" onclick="jumpToStory('${item.id}','${item.countyId}')">
+          <div class="hist-item-title">${item.title}</div>
+          <div class="hist-item-meta">
+            <span class="hist-item-county">📍 ${item.countyName || item.countyId}</span>
+            <span class="hist-item-time">${formatTime(item.timestamp)}</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+/** 從閱覽紀錄直接跳到指定故事 */
+async function jumpToStory(storyId, countyId) {
+  if (currentCountyId !== countyId) {
+    const pathEl    = document.querySelector(`#county-${countyId}`);
+    const countyName = pathEl ? pathEl.dataset.name : countyId;
+    await selectCounty(countyId, countyName);
+  }
+  const story = currentStories.find(s => s.id === storyId);
+  if (story) showDetail(story);
 }
 
 // ════════════════════════════════════════════════
@@ -570,6 +692,19 @@ function addTagBtn(label, val, active, container) {
   container.appendChild(btn);
 }
 
+// ── 即時更新單張卡片的已讀標籤 ─────────────────────
+function _markCardRead(id) {
+  const card = $('sc-' + id);
+  if (!card) return;
+  const top = card.querySelector('.sc-top');
+  if (top && !top.querySelector('.sc-read-tag')) {
+    const badge = document.createElement('span');
+    badge.className   = 'sc-read-tag';
+    badge.textContent = '已閱覽';
+    top.insertBefore(badge, top.firstChild);
+  }
+}
+
 // ── 故事列表 ─────────────────────────────────────
 function renderStoryList(stories) {
   const box = $('storyCards');
@@ -585,6 +720,7 @@ function renderStoryList(stories) {
     card.onclick     = () => showDetail(s);
     card.innerHTML   = `
       <div class="sc-top">
+        ${isRead(s.id) ? '<span class="sc-read-tag">已閱覽</span>' : ''}
         <div class="sc-title">${s.title}</div>
         <div class="sc-tag">${s.tag}</div>
       </div>
@@ -599,6 +735,8 @@ function renderStoryList(stories) {
 function showDetail(s) {
   activeStoryId   = s.id;
   ttsCurrentStory = s;   // ← 記住當前故事供 TTS 重播使用
+  addToHistory(s);        // ← 寫入閱覽紀錄
+  _markCardRead(s.id);    // ← 即時在卡片上顯示已閱覽標籤
 
   document.querySelectorAll('.story-card').forEach(c => c.classList.remove('active'));
   const card = $('sc-' + s.id);
@@ -646,6 +784,7 @@ function clearDetail() {
   _cancelSpeech();
   ttsCurrentStory = null;
 
+  renderHistory();               // ← 更新閱覽紀錄顯示
   $('detailEmpty').style.display = 'flex';
   $('detailInner').style.display = 'none';
 }
@@ -692,7 +831,7 @@ function updateSoundUI() {
 }
 
 // ── 啟動 ─────────────────────────────────────────
-init();
+init().then(() => renderHistory()); // 頁面啟動時渲染初始狀態
 </script>
 </body>
 </html>
