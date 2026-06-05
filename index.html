@@ -423,7 +423,7 @@
           .then(() => { isPlaying = true; updateSoundUI(); })
           .catch(err => {
             console.error('音效載入失敗:', err);
-            alert('音效載入失敗，請確認 ghost_bgm.m4a 已放在專案根目錄。');
+            alert('音效載入失敗，請確認 ghost_bgm.mp3 已放在專案根目錄。');
           });
         return; // 等 promise 回來再更新 UI
       }
