@@ -17,8 +17,8 @@
   --red-glow: rgba(139,0,0,.35);
   --gold: #c9922a;
   --text: #e0d4c0;
-  --dim: #8a7a6a;
-  --muted: #4a3a2a;
+  --dim: #b3a6a0;
+  --muted: #f18806;
   --serif: 'Noto Serif TC', serif;
   --mono: 'Courier Prime', monospace;
 }
@@ -36,7 +36,7 @@ header { flex-shrink: 0; border-bottom: 1px solid var(--border); background: rgb
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.55} }
 .logo-title { font-size: 17px; font-weight: 900; color: var(--red); letter-spacing: .14em; display: flex; align-items: center; gap: 8px; }
 .logo-badge { font-family: var(--mono); font-size: 8px; border: 1px solid var(--border); padding: 2px 6px; color: var(--dim); font-weight: 400; }
-.logo-sub { font-size: 10px; color: var(--muted); letter-spacing: .09em; margin-top: 2px; }
+.logo-sub { font-size: 12px; color: var(--dim); letter-spacing: .09em; margin-top: 2px; }
 .header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .btn-sound { display: flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border); color: var(--dim); font-family: var(--serif); font-size: 11px; padding: 5px 12px; cursor: pointer; letter-spacing: .07em; transition: all .25s; }
 .btn-sound:hover, .btn-sound.on { border-color: var(--border-hi); color: var(--red); background: rgba(139,0,0,.08); }
@@ -96,7 +96,7 @@ main { flex: 1; overflow: hidden; display: grid; grid-template-columns: 420px 1f
 .sc-title { font-size: 12px; font-weight: 700; color: var(--text); letter-spacing: .04em; line-height: 1.4; }
 .story-card.active .sc-title { color: var(--red); }
 .sc-tag { font-family: var(--mono); font-size: 8px; border: 1px solid var(--border); padding: 2px 4px; color: var(--gold); white-space: nowrap; flex-shrink: 0; }
-.sc-loc { font-size: 10px; color: var(--muted); }
+.sc-loc { font-size: 10px; color: var(--dim); }
 .sc-flames { display: flex; gap: 2px; font-size: 10px; }
 .flame { color: var(--muted); } .flame.lit { color: var(--red); }
 .empty-note { padding: 24px; text-align: center; }
@@ -114,7 +114,7 @@ main { flex: 1; overflow: hidden; display: grid; grid-template-columns: 420px 1f
 .d-id { font-family: var(--mono); font-size: 10px; color: var(--muted); }
 .d-title { font-size: 22px; font-weight: 900; color: var(--text); letter-spacing: .14em; line-height: 1.35; margin-bottom: 10px; }
 .d-scary { display: flex; align-items: center; gap: 9px; margin-bottom: 16px; }
-.d-scary-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: .12em; }
+.d-scary-label { font-family: var(--mono); font-size: 11px; color: var(--dim); letter-spacing: .12em; }
 .d-flames { display: flex; gap: 3px; font-size: 13px; }
 .d-flame.lit { color: var(--red); animation: flicker 1.4s ease-in-out infinite alternate; }
 @keyframes flicker { 0%{opacity:1} 100%{opacity:.5} }
@@ -135,14 +135,14 @@ main { flex: 1; overflow: hidden; display: grid; grid-template-columns: 420px 1f
 .hist-wrap { width: 100%; padding: 0 22px 20px; }
 .hist-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .hist-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: .15em; }
-.hist-clear { font-family: var(--mono); font-size: 9px; color: var(--muted); background: transparent; border: none; cursor: pointer; letter-spacing: .07em; transition: color .2s; padding: 0; }
+.hist-clear { font-family: var(--mono); font-size: 11px; color: var(--dim); background: transparent; border: none; cursor: pointer; letter-spacing: .07em; transition: color .2s; padding: 0; }
 .hist-clear:hover { color: var(--red); }
 .hist-item { padding: 8px 10px; border: 1px solid transparent; cursor: pointer; transition: all .2s; margin-bottom: 3px; display: flex; flex-direction: column; gap: 4px; }
 .hist-item:hover { background: var(--bg-hover); border-color: var(--border); }
 .hist-item-title { font-size: 12px; font-weight: 700; color: var(--text); letter-spacing: .04em; line-height: 1.4; }
 .hist-item-meta { display: flex; align-items: center; gap: 6px; }
-.hist-item-county { font-size: 10px; color: var(--muted); }
-.hist-item-time { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-left: auto; }
+.hist-item-county { font-size: 10px; color: var(--dim); }
+.hist-item-time { font-family: var(--mono); font-size: 11px; color: var(--dim); margin-left: auto; }
 
 /* ── [新增] TTS 語音朗讀控制列 ── */
 .d-tts {
@@ -261,7 +261,7 @@ footer p + p { margin-top: 2px; opacity: .55; }
           <div class="sl-county" id="slCounty">
             <span style="animation:pulse 2s ease-in-out infinite;color:var(--red)">🔥</span>
             <span id="slCountyName">請點選地圖縣市</span>
-            <span id="slCountyCount" style="font-size:12px;color:var(--dim);font-weight:400"></span>
+            <span id="slCountyCount" style="font-size:14px;color:var(--dim);font-weight:400"></span>
           </div>
           <div class="sl-count" id="slCount"></div>
         </div>
@@ -385,8 +385,8 @@ function renderHistory() {
   el.style.alignItems     = 'stretch';
   el.innerHTML = `
     <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 22px 14px;flex-shrink:0;border-bottom:1px solid var(--border)">
-      <div class="skull" style="font-size:26px">☠</div>
-      <p style="font-size:11px;color:var(--muted);letter-spacing:.08em;margin:0">點選地圖繼續探索</p>
+      <div class="skull" style="font-size:46px; color:var(--red); opacity:0.6;">☠</div>
+      <p style="font-size:15px;color:var(--dim);letter-spacing:.08em;margin:0">點選地圖繼續探索</p>
     </div>
     <div class="hist-wrap" style="overflow-y:auto;flex:1">
       <div class="hist-hd">
@@ -461,8 +461,8 @@ function speakStory(s) {
 
   ttsUtterance          = new SpeechSynthesisUtterance(text);
   ttsUtterance.lang     = 'zh-TW';
-  ttsUtterance.rate     = 0.75;
-  ttsUtterance.pitch    = 0.5;
+  ttsUtterance.rate     = 0.82;
+  ttsUtterance.pitch    = 0.88;
   ttsUtterance.volume   = 1.0;
   // 優先序：Windows Yating → macOS Meijia → 任何 zh-TW → 任何中文 → 系統預設
   // ttsVoices 已在頁面啟動時由 voiceschanged 事件預載，確保這裡能拿到完整清單
