@@ -414,17 +414,24 @@
     }
 
     // ── 音效 ─────────────────────────────────────────
-    function toggleSound() {
-      if (!audio) {
-        audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2513/2513-84.wav');
-        audio.loop = true; audio.volume = 0.3;
-        audio.play().then(() => { isPlaying = true; updateSoundUI(); })
-          .catch(() => alert('請再點一次以啟動音效。'));
-      } else {
-        isPlaying ? audio.pause() : audio.play();
-        isPlaying = !isPlaying;
-        updateSoundUI();
-      }
+   function toggleSound() {
+     if (!audio) {
+    // 💡 將路徑改成你放在資料夾內的 mp3 檔名
+    audio = new Audio('/ghost_bgm.mp3'); 
+    
+    // loop = true 代表會無限循環播放
+    audio.loop = true; 
+    
+    // volume 可以調整音量大小（0.0 到 1.0 之間），0.3 代表 30% 音量
+    audio.volume = 1.0; 
+    
+    audio.play().then(() => { isPlaying = true; updateSoundUI(); })
+      .catch(() => alert('請再點一次以啟動音效。'));
+     } else {
+    isPlaying ? audio.pause() : audio.play();
+    isPlaying = !isPlaying;
+    updateSoundUI();
+     }
     }
     function updateSoundUI() {
       const btn = $('soundBtn');
