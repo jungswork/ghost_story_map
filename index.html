@@ -1,450 +1,678 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>台灣鬼事地圖 | 探索台灣各地的靈異傳說與民俗禁忌</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg:        #080604;
-      --bg-card:   #100d0a;
-      --bg-hover:  #1c1612;
-      --border:    rgba(139,0,0,.2);
-      --border-hi: rgba(139,0,0,.6);
-      --red:       #8b0000;
-      --red-glow:  rgba(139,0,0,.35);
-      --gold:      #c9922a;
-      --text:      #e0d4c0;
-      --dim:       #8a7a6a;
-      --muted:     #4a3a2a;
-      --serif:     'Noto Serif TC', serif;
-      --mono:      'Courier Prime', monospace;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--serif); overflow: hidden; }
-    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>台灣鬼事地圖 | 探索台灣各地的靈異傳說與民俗禁忌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080604;
+  --bg-card: #100d0a;
+  --bg-hover: #1c1612;
+  --border: rgba(139,0,0,.2);
+  --border-hi: rgba(139,0,0,.6);
+  --red: #8b0000;
+  --red-glow: rgba(139,0,0,.35);
+  --gold: #c9922a;
+  --text: #e0d4c0;
+  --dim: #8a7a6a;
+  --muted: #4a3a2a;
+  --serif: 'Noto Serif TC', serif;
+  --mono: 'Courier Prime', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--serif); overflow: hidden; }
+::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); }
 
-    /* ── TOP BAR ── */
-    .top-bar { height: 3px; background: linear-gradient(90deg, transparent, var(--red), var(--gold), var(--red), transparent); box-shadow: 0 0 18px var(--red-glow); flex-shrink: 0; }
+/* ── TOP BAR ── */
+.top-bar { height: 3px; background: linear-gradient(90deg, transparent, var(--red), var(--gold), var(--red), transparent); box-shadow: 0 0 18px var(--red-glow); flex-shrink: 0; }
 
-    /* ── HEADER ── */
-    header { flex-shrink: 0; border-bottom: 1px solid var(--border); background: rgba(8,6,4,.96); backdrop-filter: blur(10px); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-    .logo { display: flex; align-items: center; gap: 10px; }
-    .logo-icon { width: 34px; height: 34px; border: 1px solid var(--border-hi); display: flex; align-items: center; justify-content: center; background: rgba(139,0,0,.1); font-size: 16px; animation: pulse 2.5s ease-in-out infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.55} }
-    .logo-title { font-size: 17px; font-weight: 900; color: var(--red); letter-spacing: .14em; display: flex; align-items: center; gap: 8px; }
-    .logo-badge { font-family: var(--mono); font-size: 8px; border: 1px solid var(--border); padding: 2px 6px; color: var(--dim); font-weight: 400; }
-    .logo-sub { font-size: 10px; color: var(--muted); letter-spacing: .09em; margin-top: 2px; }
-    .header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-    .btn-sound { display: flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border); color: var(--dim); font-family: var(--serif); font-size: 11px; padding: 5px 12px; cursor: pointer; letter-spacing: .07em; transition: all .25s; }
-    .btn-sound:hover, .btn-sound.on { border-color: var(--border-hi); color: var(--red); background: rgba(139,0,0,.08); }
-    .stats-pill { font-family: var(--mono); font-size: 11px; border: 1px solid var(--border); padding: 4px 10px; color: var(--gold); background: rgba(201,146,42,.05); white-space: nowrap; }
+/* ── HEADER ── */
+header { flex-shrink: 0; border-bottom: 1px solid var(--border); background: rgba(8,6,4,.96); backdrop-filter: blur(10px); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon { width: 34px; height: 34px; border: 1px solid var(--border-hi); display: flex; align-items: center; justify-content: center; background: rgba(139,0,0,.1); font-size: 16px; animation: pulse 2.5s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.55} }
+.logo-title { font-size: 17px; font-weight: 900; color: var(--red); letter-spacing: .14em; display: flex; align-items: center; gap: 8px; }
+.logo-badge { font-family: var(--mono); font-size: 8px; border: 1px solid var(--border); padding: 2px 6px; color: var(--dim); font-weight: 400; }
+.logo-sub { font-size: 10px; color: var(--muted); letter-spacing: .09em; margin-top: 2px; }
+.header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.btn-sound { display: flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--border); color: var(--dim); font-family: var(--serif); font-size: 11px; padding: 5px 12px; cursor: pointer; letter-spacing: .07em; transition: all .25s; }
+.btn-sound:hover, .btn-sound.on { border-color: var(--border-hi); color: var(--red); background: rgba(139,0,0,.08); }
+.stats-pill { font-family: var(--mono); font-size: 11px; border: 1px solid var(--border); padding: 4px 10px; color: var(--gold); background: rgba(201,146,42,.05); white-space: nowrap; }
 
-    /* ── LAYOUT ── */
-    body { display: flex; flex-direction: column; }
-    main { flex: 1; overflow: hidden; display: grid; grid-template-columns: 420px 1fr; }
+/* ── LAYOUT ── */
+body { display: flex; flex-direction: column; }
+main { flex: 1; overflow: hidden; display: grid; grid-template-columns: 420px 1fr; }
 
-    /* ── LEFT: MAP PANEL ── */
-    .map-panel { border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
-    .map-panel-head { flex-shrink: 0; padding: 10px 13px 8px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-end; }
-    .ph-label { font-family: var(--mono); font-size: 8px; color: var(--muted); letter-spacing: .15em; margin-bottom: 2px; }
-    .ph-title { font-size: 13px; font-weight: 700; letter-spacing: .1em; }
-    .ph-focus { text-align: right; }
-    .ph-focus-label { font-family: var(--mono); font-size: 8px; color: var(--muted); letter-spacing: .12em; }
-    .ph-focus-name { font-size: 14px; font-weight: 700; color: var(--red); letter-spacing: .12em; }
+/* ── LEFT: MAP PANEL ── */
+.map-panel { border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+.map-panel-head { flex-shrink: 0; padding: 10px 13px 8px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-end; }
+.ph-label { font-family: var(--mono); font-size: 8px; color: var(--muted); letter-spacing: .15em; margin-bottom: 2px; }
+.ph-title { font-size: 13px; font-weight: 700; letter-spacing: .1em; }
+.ph-focus { text-align: right; }
+.ph-focus-label { font-family: var(--mono); font-size: 8px; color: var(--muted); letter-spacing: .12em; }
+.ph-focus-name { font-size: 14px; font-weight: 700; color: var(--red); letter-spacing: .12em; }
+.map-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 12px; overflow: hidden; position: relative; }
+#taiwan-svg { width: 100%; max-width: 360px; height: auto; drop-shadow: 0 15px 30px rgba(0,0,0,.8); cursor: pointer; }
+#taiwan-svg path { fill: #1a1208; stroke: #4a3a2a; stroke-width: 1.5; transition: fill .2s, stroke .2s, filter .2s; }
+#taiwan-svg path:hover { fill: #3d2a10; stroke: var(--gold); stroke-width: 2; filter: drop-shadow(0 0 6px rgba(201,146,42,.4)); }
+#taiwan-svg path.selected { fill: rgba(139,0,0,.3); stroke: var(--red); stroke-width: 2.5; filter: drop-shadow(0 0 8px rgba(139,0,0,.5)); }
+#taiwan-svg path.has-stories { fill: #1e150a; }
+#taiwan-svg path.has-stories:hover { fill: #3d2a10; }
 
-    .map-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 12px; overflow: hidden; position: relative; }
-    #taiwan-svg { width: 100%; max-width: 360px; height: auto; drop-shadow: 0 15px 30px rgba(0,0,0,.8); cursor: pointer; }
-    #taiwan-svg path { fill: #1a1208; stroke: #4a3a2a; stroke-width: 1.5; transition: fill .2s, stroke .2s, filter .2s; }
-    #taiwan-svg path:hover { fill: #3d2a10; stroke: var(--gold); stroke-width: 2; filter: drop-shadow(0 0 6px rgba(201,146,42,.4)); }
-    #taiwan-svg path.selected { fill: rgba(139,0,0,.3); stroke: var(--red); stroke-width: 2.5; filter: drop-shadow(0 0 8px rgba(139,0,0,.5)); }
-    #taiwan-svg path.has-stories { fill: #1e150a; }
-    #taiwan-svg path.has-stories:hover { fill: #3d2a10; }
+/* Hover tooltip */
+#map-tooltip { position: absolute; top: 14px; left: 14px; background: rgba(8,6,4,.95); border: 1px solid var(--border-hi); padding: 8px 14px; pointer-events: none; opacity: 0; transition: opacity .2s; z-index: 10; }
+#map-tooltip.show { opacity: 1; }
+#map-tooltip .tt-label { font-family: var(--mono); font-size: 8px; color: var(--gold); letter-spacing: .15em; }
+#map-tooltip .tt-name { font-size: 18px; font-weight: 900; color: var(--text); letter-spacing: .15em; margin-top: 2px; }
+#map-tooltip .tt-line { height: 1px; background: linear-gradient(90deg, var(--red), transparent); margin-top: 5px; }
 
-    /* Hover tooltip */
-    #map-tooltip { position: absolute; top: 14px; left: 14px; background: rgba(8,6,4,.95); border: 1px solid var(--border-hi); padding: 8px 14px; pointer-events: none; opacity: 0; transition: opacity .2s; z-index: 10; }
-    #map-tooltip.show { opacity: 1; }
-    #map-tooltip .tt-label { font-family: var(--mono); font-size: 8px; color: var(--gold); letter-spacing: .15em; }
-    #map-tooltip .tt-name { font-size: 18px; font-weight: 900; color: var(--text); letter-spacing: .15em; margin-top: 2px; }
-    #map-tooltip .tt-line { height: 1px; background: linear-gradient(90deg, var(--red), transparent); margin-top: 5px; }
+/* Map bottom: taboo list */
+.map-taboo { flex-shrink: 0; border-top: 1px solid var(--border); padding: 10px 14px 12px; background: rgba(8,6,4,.5); }
+.taboo-title { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--red); letter-spacing: .1em; margin-bottom: 6px; }
+.taboo-title span { animation: pulse 2s ease-in-out infinite; }
+.taboo-list { list-style: none; }
+.taboo-list li { font-size: 10px; color: var(--dim); letter-spacing: .04em; line-height: 1.7; padding-left: 10px; position: relative; }
+.taboo-list li::before { content: '·'; position: absolute; left: 0; color: var(--red); }
 
-    /* Map bottom: taboo list */
-    .map-taboo { flex-shrink: 0; border-top: 1px solid var(--border); padding: 10px 14px 12px; background: rgba(8,6,4,.5); }
-    .taboo-title { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--red); letter-spacing: .1em; margin-bottom: 6px; }
-    .taboo-title span { animation: pulse 2s ease-in-out infinite; }
-    .taboo-list { list-style: none; }
-    .taboo-list li { font-size: 10px; color: var(--dim); letter-spacing: .04em; line-height: 1.7; padding-left: 10px; position: relative; }
-    .taboo-list li::before { content: '·'; position: absolute; left: 0; color: var(--red); }
+/* ── RIGHT: STORY PANEL ── */
+.story-panel { display: flex; flex-direction: column; overflow: hidden; }
 
-    /* ── RIGHT: STORY PANEL ── */
-    .story-panel { display: flex; flex-direction: column; overflow: hidden; }
+/* Story list top */
+.story-list-wrap { flex-shrink: 0; border-bottom: 1px solid var(--border); }
+.sl-head { padding: 10px 14px 8px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-end; }
+.sl-county { font-size: 14px; font-weight: 700; color: var(--red); letter-spacing: .12em; display: flex; align-items: center; gap: 6px; }
+.sl-count { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
+.tag-bar { padding: 7px 10px; display: flex; flex-wrap: wrap; gap: 5px; border-bottom: 1px solid var(--border); }
+.tag-btn { font-family: var(--serif); font-size: 10px; padding: 3px 8px; border: 1px solid var(--border); background: transparent; color: var(--dim); cursor: pointer; letter-spacing: .05em; transition: all .2s; }
+.tag-btn:hover, .tag-btn.active { border-color: var(--border-hi); color: var(--red); background: rgba(139,0,0,.08); }
+.story-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 6px; max-height: 190px; overflow-y: auto; }
+.story-card { padding: 10px 9px; border: 1px solid transparent; cursor: pointer; transition: all .22s; display: flex; flex-direction: column; gap: 4px; }
+.story-card:hover { background: var(--bg-hover); border-color: var(--border); }
+.story-card.active { background: rgba(139,0,0,.1); border-color: var(--border-hi); }
+.sc-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; }
+.sc-title { font-size: 12px; font-weight: 700; color: var(--text); letter-spacing: .04em; line-height: 1.4; }
+.story-card.active .sc-title { color: var(--red); }
+.sc-tag { font-family: var(--mono); font-size: 8px; border: 1px solid var(--border); padding: 2px 4px; color: var(--gold); white-space: nowrap; flex-shrink: 0; }
+.sc-loc { font-size: 10px; color: var(--muted); }
+.sc-flames { display: flex; gap: 2px; font-size: 10px; }
+.flame { color: var(--muted); } .flame.lit { color: var(--red); }
+.empty-note { padding: 24px; text-align: center; }
+.empty-note p { font-size: 12px; color: var(--muted); line-height: 1.9; letter-spacing: .08em; }
 
-    /* Story list top */
-    .story-list-wrap { flex-shrink: 0; border-bottom: 1px solid var(--border); }
-    .sl-head { padding: 10px 14px 8px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-end; }
-    .sl-county { font-size: 14px; font-weight: 700; color: var(--red); letter-spacing: .12em; display: flex; align-items: center; gap: 6px; }
-    .sl-count { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
-    .tag-bar { padding: 7px 10px; display: flex; flex-wrap: wrap; gap: 5px; border-bottom: 1px solid var(--border); }
-    .tag-btn { font-family: var(--serif); font-size: 10px; padding: 3px 8px; border: 1px solid var(--border); background: transparent; color: var(--dim); cursor: pointer; letter-spacing: .05em; transition: all .2s; }
-    .tag-btn:hover, .tag-btn.active { border-color: var(--border-hi); color: var(--red); background: rgba(139,0,0,.08); }
-    .story-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 6px; max-height: 190px; overflow-y: auto; }
-    .story-card { padding: 10px 9px; border: 1px solid transparent; cursor: pointer; transition: all .22s; display: flex; flex-direction: column; gap: 4px; }
-    .story-card:hover { background: var(--bg-hover); border-color: var(--border); }
-    .story-card.active { background: rgba(139,0,0,.1); border-color: var(--border-hi); }
-    .sc-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; }
-    .sc-title { font-size: 12px; font-weight: 700; color: var(--text); letter-spacing: .04em; line-height: 1.4; }
-    .story-card.active .sc-title { color: var(--red); }
-    .sc-tag { font-family: var(--mono); font-size: 8px; border: 1px solid var(--border); padding: 2px 4px; color: var(--gold); white-space: nowrap; flex-shrink: 0; }
-    .sc-loc { font-size: 10px; color: var(--muted); }
-    .sc-flames { display: flex; gap: 2px; font-size: 10px; }
-    .flame { color: var(--muted); } .flame.lit { color: var(--red); }
-    .empty-note { padding: 24px; text-align: center; }
-    .empty-note p { font-size: 12px; color: var(--muted); line-height: 1.9; letter-spacing: .08em; }
+/* Story detail */
+.story-detail { flex: 1; overflow-y: auto; }
+.detail-empty { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; color: var(--muted); text-align: center; }
+.skull { font-size: 48px; opacity: .15; }
+.detail-empty h3 { font-size: 14px; font-weight: 400; letter-spacing: .12em; }
+.detail-empty p { font-size: 11px; opacity: .6; letter-spacing: .08em; line-height: 1.9; }
+.detail-inner { padding: 24px 28px; }
+.d-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.d-tag { font-family: var(--mono); font-size: 10px; border: 1px solid var(--red); padding: 3px 9px; color: var(--red); background: rgba(139,0,0,.07); }
+.d-id { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+.d-title { font-size: 22px; font-weight: 900; color: var(--text); letter-spacing: .14em; line-height: 1.35; margin-bottom: 10px; }
+.d-scary { display: flex; align-items: center; gap: 9px; margin-bottom: 16px; }
+.d-scary-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: .12em; }
+.d-flames { display: flex; gap: 3px; font-size: 13px; }
+.d-flame.lit { color: var(--red); animation: flicker 1.4s ease-in-out infinite alternate; }
+@keyframes flicker { 0%{opacity:1} 100%{opacity:.5} }
+.d-divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+.d-loc { display: flex; align-items: flex-start; gap: 8px; background: rgba(139,0,0,.04); border: 1px solid var(--border); padding: 9px 12px; margin-bottom: 14px; font-size: 12px; color: var(--dim); }
+.d-loc strong { color: var(--text); }
+.d-summary { border-left: 2px solid var(--red); padding: 9px 14px; background: rgba(139,0,0,.04); font-style: italic; font-size: 13px; color: var(--dim); line-height: 1.85; margin-bottom: 18px; }
+.d-body { font-size: 13px; line-height: 2; color: var(--dim); letter-spacing: .04em; }
+.d-body p { margin-bottom: 12px; }
+.d-warn { display: flex; align-items: flex-start; gap: 9px; border-top: 1px solid var(--border); padding-top: 14px; margin-top: 20px; }
+.d-warn-icon { flex-shrink: 0; font-size: 13px; color: var(--gold); margin-top: 2px; }
+.d-warn-text { font-size: 11px; color: rgba(201,146,42,.65); letter-spacing: .06em; line-height: 1.75; }
 
-    /* Story detail */
-    .story-detail { flex: 1; overflow-y: auto; }
-    .detail-empty { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; color: var(--muted); text-align: center; }
-    .skull { font-size: 48px; opacity: .15; }
-    .detail-empty h3 { font-size: 14px; font-weight: 400; letter-spacing: .12em; }
-    .detail-empty p { font-size: 11px; opacity: .6; letter-spacing: .08em; line-height: 1.9; }
-    .detail-inner { padding: 24px 28px; }
-    .d-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .d-tag { font-family: var(--mono); font-size: 10px; border: 1px solid var(--red); padding: 3px 9px; color: var(--red); background: rgba(139,0,0,.07); }
-    .d-id { font-family: var(--mono); font-size: 10px; color: var(--muted); }
-    .d-title { font-size: 22px; font-weight: 900; color: var(--text); letter-spacing: .14em; line-height: 1.35; margin-bottom: 10px; }
-    .d-scary { display: flex; align-items: center; gap: 9px; margin-bottom: 16px; }
-    .d-scary-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: .12em; }
-    .d-flames { display: flex; gap: 3px; font-size: 13px; }
-    .d-flame.lit { color: var(--red); animation: flicker 1.4s ease-in-out infinite alternate; }
-    @keyframes flicker { 0%{opacity:1} 100%{opacity:.5} }
-    .d-divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
-    .d-loc { display: flex; align-items: flex-start; gap: 8px; background: rgba(139,0,0,.04); border: 1px solid var(--border); padding: 9px 12px; margin-bottom: 14px; font-size: 12px; color: var(--dim); }
-    .d-loc strong { color: var(--text); }
-    .d-summary { border-left: 2px solid var(--red); padding: 9px 14px; background: rgba(139,0,0,.04); font-style: italic; font-size: 13px; color: var(--dim); line-height: 1.85; margin-bottom: 18px; }
-    .d-body { font-size: 13px; line-height: 2; color: var(--dim); letter-spacing: .04em; }
-    .d-body p { margin-bottom: 12px; }
-    .d-warn { display: flex; align-items: flex-start; gap: 9px; border-top: 1px solid var(--border); padding-top: 14px; margin-top: 20px; }
-    .d-warn-icon { flex-shrink: 0; font-size: 13px; color: var(--gold); margin-top: 2px; }
-    .d-warn-text { font-size: 11px; color: rgba(201,146,42,.65); letter-spacing: .06em; line-height: 1.75; }
+/* ── [新增] TTS 語音朗讀控制列 ── */
+.d-tts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 7px 11px;
+  border: 1px solid var(--border);
+  background: rgba(139,0,0,.03);
+}
+.d-tts-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: .14em;
+  flex-shrink: 0;
+}
+.d-tts-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--dim);
+  font-size: 11px;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  font-family: var(--serif);
+  transition: all .2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.d-tts-btn:hover { border-color: var(--border-hi); color: var(--red); background: rgba(139,0,0,.08); }
+.d-tts-btn.on { border-color: var(--red); color: var(--red); background: rgba(139,0,0,.1); }
+.d-tts-status {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity .3s;
+  white-space: nowrap;
+}
+.d-tts-status.show { opacity: 1; color: var(--red); }
+.d-tts-status.show.paused { color: var(--gold); }
+@keyframes tts-blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+.d-tts-status.show.reading { animation: tts-blink 1.2s ease-in-out infinite; }
 
-    /* ── FOOTER ── */
-    footer { flex-shrink: 0; border-top: 1px solid var(--border); background: rgba(8,6,4,.95); padding: 8px 20px; text-align: center; }
-    footer p { font-size: 10px; color: var(--muted); letter-spacing: .09em; }
-    footer p + p { margin-top: 2px; opacity: .55; }
-  </style>
+/* ── FOOTER ── */
+footer { flex-shrink: 0; border-top: 1px solid var(--border); background: rgba(8,6,4,.95); padding: 8px 20px; text-align: center; }
+footer p { font-size: 10px; color: var(--muted); letter-spacing: .09em; }
+footer p + p { margin-top: 2px; opacity: .55; }
+</style>
 </head>
 <body>
-  <div class="top-bar"></div>
+<div class="top-bar"></div>
+<header>
+  <div class="logo">
+    <div class="logo-icon">☠</div>
+    <div>
+      <div class="logo-title">台灣鬼事地圖 <span class="logo-badge">ANALOG_FOLKLORE</span></div>
+      <div class="logo-sub">「硃砂勾勒輿圖，紅絲牽引冤魂」—— 台灣各縣市靈異都市傳說記載</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="btn-sound" id="soundBtn" onclick="toggleSound()">
+      <span id="soundIcon">🔇</span>
+      <span id="soundLabel">開啟靈異氛圍音效</span>
+    </button>
+    <div class="stats-pill" id="statsPill">載入中…</div>
+  </div>
+</header>
 
-  <header>
-    <div class="logo">
-      <div class="logo-icon">☠</div>
+<main>
+  <!-- ── 左側：台灣 SVG 地圖 ── -->
+  <div class="map-panel">
+    <div class="map-panel-head">
       <div>
-        <div class="logo-title">台灣鬼事地圖 <span class="logo-badge">ANALOG_FOLKLORE</span></div>
-        <div class="logo-sub">「硃砂勾勒輿圖，紅絲牽引冤魂」—— 台灣各縣市靈異都市傳說記載</div>
+        <div class="ph-label">MAP_EXPLORER</div>
+        <div class="ph-title">台灣靈異輿圖</div>
+      </div>
+      <div class="ph-focus">
+        <div class="ph-focus-label">CURRENT_FOCUS</div>
+        <div class="ph-focus-name" id="focusName">請選擇縣市</div>
       </div>
     </div>
-    <div class="header-right">
-      <button class="btn-sound" id="soundBtn" onclick="toggleSound()">
-        <span id="soundIcon">🔇</span>
-        <span id="soundLabel">開啟靈異氛圍音效</span>
-      </button>
-      <div class="stats-pill" id="statsPill">載入中…</div>
+    <div class="map-wrap">
+      <div id="map-tooltip">
+        <div class="tt-label">TERRITORY_FOCUS</div>
+        <div class="tt-name" id="tooltip-name"></div>
+        <div class="tt-line"></div>
+      </div>
+      <svg id="taiwan-svg" viewBox="0 0 1000 1295" xmlns="http://www.w3.org/2000/svg" aria-label="台灣地圖">
+        <g id="counties-group"></g>
+      </svg>
     </div>
-  </header>
+    <div class="map-taboo">
+      <div class="taboo-title"><span>⚠</span> 鬼月民間五大禁忌</div>
+      <ul class="taboo-list">
+        <li>半夜切勿吹口哨，以免引來好兄弟跟隨。</li>
+        <li>路邊的紅包、零錢、冥紙，千萬不可隨意撿拾。</li>
+        <li>夜間不宜晾曬衣服，衣服形狀容易吸引靈體依附。</li>
+        <li>不宜去無安全人員看管的荒野、溪流、海邊戲水。</li>
+        <li>若感覺肩膀被拍，千萬不要只轉頭，應整個人轉過去。</li>
+      </ul>
+    </div>
+  </div>
 
-  <main>
-    <!-- ── 左側：台灣 SVG 地圖 ── -->
-    <div class="map-panel">
-      <div class="map-panel-head">
+  <!-- ── 右側：故事列表 + 詳情 ── -->
+  <div class="story-panel">
+    <!-- 故事列表 -->
+    <div class="story-list-wrap">
+      <div class="sl-head">
         <div>
-          <div class="ph-label">MAP_EXPLORER</div>
-          <div class="ph-title">台灣靈異輿圖</div>
-        </div>
-        <div class="ph-focus">
-          <div class="ph-focus-label">CURRENT_FOCUS</div>
-          <div class="ph-focus-name" id="focusName">請選擇縣市</div>
+          <div class="sl-county" id="slCounty">
+            <span style="animation:pulse 2s ease-in-out infinite;color:var(--red)">🔥</span>
+            <span id="slCountyName">請點選地圖縣市</span>
+            <span id="slCountyCount" style="font-size:12px;color:var(--dim);font-weight:400"></span>
+          </div>
+          <div class="sl-count" id="slCount"></div>
         </div>
       </div>
-
-      <div class="map-wrap">
-        <div id="map-tooltip">
-          <div class="tt-label">TERRITORY_FOCUS</div>
-          <div class="tt-name" id="tooltip-name"></div>
-          <div class="tt-line"></div>
+      <div class="tag-bar" id="tagBar"></div>
+      <div class="story-cards" id="storyCards">
+        <div class="empty-note" style="grid-column:span 2">
+          <p>請點選地圖上的縣市<br>以翻開當地的靈異事件卷軸</p>
         </div>
-        <!-- SVG 地圖由 JS 動態生成 -->
-        <svg id="taiwan-svg" viewBox="0 0 1000 1295" xmlns="http://www.w3.org/2000/svg" aria-label="台灣地圖">
-          <g id="counties-group"></g>
-        </svg>
-      </div>
-
-      <div class="map-taboo">
-        <div class="taboo-title"><span>⚠</span> 鬼月民間五大禁忌</div>
-        <ul class="taboo-list">
-          <li>半夜切勿吹口哨，以免引來好兄弟跟隨。</li>
-          <li>路邊的紅包、零錢、冥紙，千萬不可隨意撿拾。</li>
-          <li>夜間不宜晾曬衣服，衣服形狀容易吸引靈體依附。</li>
-          <li>不宜去無安全人員看管的荒野、溪流、海邊戲水。</li>
-          <li>若感覺肩膀被拍，千萬不要只轉頭，應整個人轉過去。</li>
-        </ul>
       </div>
     </div>
 
-    <!-- ── 右側：故事列表 + 詳情 ── -->
-    <div class="story-panel">
-      <!-- 故事列表 -->
-      <div class="story-list-wrap">
-        <div class="sl-head">
-          <div>
-            <div class="sl-county" id="slCounty">
-              <span style="animation:pulse 2s ease-in-out infinite;color:var(--red)">🔥</span>
-              <span id="slCountyName">請點選地圖縣市</span>
-              <span id="slCountyCount" style="font-size:12px;color:var(--dim);font-weight:400"></span>
-            </div>
-            <div class="sl-count" id="slCount"></div>
-          </div>
-        </div>
-        <div class="tag-bar" id="tagBar"></div>
-        <div class="story-cards" id="storyCards">
-          <div class="empty-note" style="grid-column:span 2">
-            <p>請點選地圖上的縣市<br>以翻開當地的靈異事件卷軸</p>
-          </div>
-        </div>
+    <!-- 故事詳情 -->
+    <div class="story-detail" id="storyDetail">
+      <div class="detail-empty" id="detailEmpty">
+        <div class="skull">☠</div>
+        <h3>未翻開卷軸</h3>
+        <p>請點選地圖上的縣市，<br>再從上方故事清單中選擇一則異事錄。</p>
       </div>
-
-      <!-- 故事詳情 -->
-      <div class="story-detail" id="storyDetail">
-        <div class="detail-empty" id="detailEmpty">
-          <div class="skull">☠</div>
-          <h3>未翻開卷軸</h3>
-          <p>請點選地圖上的縣市，<br>再從上方故事清單中選擇一則異事錄。</p>
-        </div>
-        <div class="detail-inner" id="detailInner" style="display:none;"></div>
-      </div>
+      <div class="detail-inner" id="detailInner" style="display:none;"></div>
     </div>
-  </main>
+  </div>
+</main>
 
-  <footer>
-    <p>© 2026 台灣鬼事地圖｜傳統民俗與都市傳說學術考證</p>
-    <p>本站所載之靈異事件皆整理自民間口耳相傳與新聞報導，旨在探討台灣本土民俗文化，請抱持敬畏與理性態度瀏覽。</p>
-  </footer>
+<footer>
+  <p>© 2026 台灣鬼事地圖｜傳統民俗與都市傳說學術考證</p>
+  <p>本站所載之靈異事件皆整理自民間口耳相傳與新聞報導，旨在探討台灣本土民俗文化，請抱持敬畏與理性態度瀏覽。</p>
+</footer>
 
-  <script>
-    // ── 狀態 ────────────────────────────────────────
-    let currentCountyId  = null;
-    let currentStories   = [];
-    let activeStoryId    = null;
-    let selectedTag      = null;
-    let countyCountMap   = {};
-    let audio            = null;
-    let isPlaying        = false;
+<script>
+// ── 狀態 ────────────────────────────────────────
+let currentCountyId = null;
+let currentStories  = [];
+let activeStoryId   = null;
+let selectedTag     = null;
+let countyCountMap  = {};
+let audio           = null;
+let isPlaying       = false;
 
-    // ── 工具函式 ─────────────────────────────────────
-    const $ = id => document.getElementById(id);
-    const fetch_json = url => fetch(url).then(r => r.json());
+// ── 工具函式 ─────────────────────────────────────
+const $ = id => document.getElementById(id);
+const fetch_json = url => fetch(url).then(r => r.json());
 
-    function flames(n, cls) {
-      return Array.from({length:5}, (_,i) =>
-        `<span class="${cls}${i<n?' lit':''}">${i<n?'🔥':'🔥'}</span>`
-      ).join('');
+function flames(n, cls) {
+  return Array.from({length:5}, (_,i) =>
+    `<span class="${cls}${i<n?' lit':''}">${i<n?'🔥':'🔥'}</span>`
+  ).join('');
+}
+
+// ════════════════════════════════════════════════
+//  ██████╗ TTS  語音朗讀模組
+// ════════════════════════════════════════════════
+
+// ── TTS 狀態 ─────────────────────────────────────
+let ttsState       = 'idle';   // 'idle' | 'playing' | 'paused'
+let ttsUtterance   = null;
+let ttsCurrentStory = null;
+let ttsResumeTimer = null;     // Chrome Bug Workaround 用
+
+// ── TTS 支援偵測 ─────────────────────────────────
+function isTTSSupported() {
+  return 'speechSynthesis' in window;
+}
+
+/**
+ * speakStory(s)
+ * 開始朗讀指定故事。若已有朗讀進行中，先停止再重新開始。
+ * 朗讀順序：標題 → 摘要 → 正文
+ */
+function speakStory(s) {
+  if (!isTTSSupported()) return;
+
+  // 先停止任何進行中的朗讀
+  _cancelSpeech();
+  ttsCurrentStory = s;
+
+  // 組合朗讀文字，把換行替換成停頓符號
+  const text = `${s.title}。${s.summary}。${s.content.replace(/\n+/g, '。')}`;
+
+  ttsUtterance          = new SpeechSynthesisUtterance(text);
+  ttsUtterance.lang     = 'zh-TW';
+  ttsUtterance.rate     = 0.82;  // 比正常稍慢，強化鬼故事氛圍
+  ttsUtterance.pitch    = 0.88;  // 略為低沉
+  ttsUtterance.volume   = 1.0;
+
+  ttsUtterance.onstart = () => {
+    ttsState = 'playing';
+    _updateTTSUI();
+    _startChromeWorkaround();
+  };
+
+  ttsUtterance.onend = () => {
+    ttsState = 'idle';
+    ttsUtterance = null;
+    _updateTTSUI();
+    _stopChromeWorkaround();
+  };
+
+  ttsUtterance.onerror = (e) => {
+    // 'interrupted' 是正常取消，不視為錯誤
+    if (e.error === 'interrupted' || e.error === 'canceled') return;
+    console.warn('TTS 朗讀中斷：', e.error);
+    ttsState = 'idle';
+    _updateTTSUI();
+    _stopChromeWorkaround();
+  };
+
+  window.speechSynthesis.speak(ttsUtterance);
+}
+
+/**
+ * toggleTTS()
+ * 暫停 / 繼續 切換（對應畫面上的播放鍵）
+ */
+function toggleTTS() {
+  if (!isTTSSupported()) return;
+
+  if (ttsState === 'idle') {
+    // 閒置狀態：重新播放當前故事
+    if (ttsCurrentStory) speakStory(ttsCurrentStory);
+  } else if (ttsState === 'playing') {
+    window.speechSynthesis.pause();
+    ttsState = 'paused';
+    _stopChromeWorkaround();
+    _updateTTSUI();
+  } else if (ttsState === 'paused') {
+    window.speechSynthesis.resume();
+    ttsState = 'playing';
+    _startChromeWorkaround();
+    _updateTTSUI();
+  }
+}
+
+/**
+ * stopSpeech()
+ * 完全停止朗讀（對應畫面上的停止鍵）
+ */
+function stopSpeech() {
+  if (!isTTSSupported()) return;
+  _cancelSpeech();
+  ttsCurrentStory = null;
+  _updateTTSUI();
+}
+
+// ── 內部 helper：取消語音但不清 ttsCurrentStory ─────
+function _cancelSpeech() {
+  window.speechSynthesis.cancel();
+  ttsState     = 'idle';
+  ttsUtterance = null;
+  _stopChromeWorkaround();
+}
+
+// ── Chrome Bug Workaround ────────────────────────
+// Chrome 有一個已知 bug：speechSynthesis 在約 15 秒後會自動停止。
+// 解法：每 14 秒呼叫一次 pause() + resume() 讓 Chrome 重置計時器。
+function _startChromeWorkaround() {
+  _stopChromeWorkaround();
+  ttsResumeTimer = setInterval(() => {
+    if (window.speechSynthesis.speaking && ttsState === 'playing') {
+      window.speechSynthesis.pause();
+      window.speechSynthesis.resume();
     }
+  }, 14000);
+}
 
-    // ── 初始化 ────────────────────────────────────────
-    async function init() {
-      const [mapData, stats] = await Promise.all([
-        fetch_json('/api/map-data'),
-        fetch_json('/api/stats'),
-      ]);
+function _stopChromeWorkaround() {
+  if (ttsResumeTimer) {
+    clearInterval(ttsResumeTimer);
+    ttsResumeTimer = null;
+  }
+}
 
-      // 統計縣市故事數
-      countyCountMap = stats.county_counts || {};
+// ── 更新 TTS 按鈕與狀態指示 UI ──────────────────
+function _updateTTSUI() {
+  const playBtn  = $('ttsPlay');
+  const stopBtn  = $('ttsStop');
+  const statusEl = $('ttsStatus');
+  if (!playBtn || !stopBtn || !statusEl) return;
 
-      // 更新 header
-      $('statsPill').textContent = `已收錄 ${stats.total} 宗異事`;
+  if (ttsState === 'playing') {
+    playBtn.textContent = '⏸';
+    playBtn.title       = '暫停朗讀';
+    playBtn.classList.add('on');
+    stopBtn.style.opacity       = '1';
+    stopBtn.style.pointerEvents = 'auto';
+    statusEl.textContent        = '▐▐ 朗讀中';
+    statusEl.className          = 'd-tts-status show reading';
+  } else if (ttsState === 'paused') {
+    playBtn.textContent = '▶';
+    playBtn.title       = '繼續朗讀';
+    playBtn.classList.add('on');
+    stopBtn.style.opacity       = '1';
+    stopBtn.style.pointerEvents = 'auto';
+    statusEl.textContent        = '‖ 已暫停';
+    statusEl.className          = 'd-tts-status show paused';
+  } else {
+    playBtn.textContent = '▶';
+    playBtn.title       = '朗讀故事';
+    playBtn.classList.remove('on');
+    stopBtn.style.opacity       = '0.3';
+    stopBtn.style.pointerEvents = 'none';
+    statusEl.textContent        = '';
+    statusEl.className          = 'd-tts-status';
+  }
+}
 
-      // 渲染 SVG 地圖
-      renderMap(mapData);
-    }
+// ── 組成 TTS 控制列 HTML（若瀏覽器不支援則回傳空字串）──
+function _buildTTSBlock() {
+  if (!isTTSSupported()) return '';
+  return `
+    <div class="d-tts">
+      <span class="d-tts-label">VOICE_READ</span>
+      <button class="d-tts-btn" id="ttsPlay" title="朗讀故事" onclick="toggleTTS()">▶</button>
+      <button class="d-tts-btn" id="ttsStop" title="停止朗讀"
+              onclick="stopSpeech()"
+              style="opacity:.3;pointer-events:none">■</button>
+      <span class="d-tts-status" id="ttsStatus"></span>
+    </div>`;
+}
 
-    // ── SVG 地圖 ─────────────────────────────────────
-    function renderMap(counties) {
-      const g = $('counties-group');
-      g.innerHTML = '';
-      counties.forEach(c => {
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', c.path);
-        path.setAttribute('id', 'county-' + c.id);
-        path.dataset.id = c.id;
-        path.dataset.name = c.name;
-        if (countyCountMap[c.id] > 0) path.classList.add('has-stories');
+// ════════════════════════════════════════════════
+//  初始化 & 地圖
+// ════════════════════════════════════════════════
+async function init() {
+  const [mapData, stats] = await Promise.all([
+    fetch_json('/api/map-data'),
+    fetch_json('/api/stats'),
+  ]);
+  countyCountMap = stats.county_counts || {};
+  $('statsPill').textContent = `已收錄 ${stats.total} 宗異事`;
+  renderMap(mapData);
+}
 
-        path.addEventListener('click', () => selectCounty(c.id, c.name));
-        path.addEventListener('mouseenter', () => showTooltip(c.name));
-        path.addEventListener('mouseleave', hideTooltip);
-        g.appendChild(path);
-      });
-    }
+function renderMap(counties) {
+  const g = $('counties-group');
+  g.innerHTML = '';
+  counties.forEach(c => {
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', c.path);
+    path.setAttribute('id', 'county-' + c.id);
+    path.dataset.id   = c.id;
+    path.dataset.name = c.name;
+    if (countyCountMap[c.id] > 0) path.classList.add('has-stories');
+    path.addEventListener('click', () => selectCounty(c.id, c.name));
+    path.addEventListener('mouseenter', () => showTooltip(c.name));
+    path.addEventListener('mouseleave', hideTooltip);
+    g.appendChild(path);
+  });
+}
 
-    function showTooltip(name) {
-      $('tooltip-name').textContent = name;
-      $('map-tooltip').classList.add('show');
-    }
-    function hideTooltip() {
-      $('map-tooltip').classList.remove('show');
-    }
+function showTooltip(name) {
+  $('tooltip-name').textContent = name;
+  $('map-tooltip').classList.add('show');
+}
+function hideTooltip() {
+  $('map-tooltip').classList.remove('show');
+}
 
-    // ── 選擇縣市 ─────────────────────────────────────
-    async function selectCounty(id, name) {
-      currentCountyId = id;
-      selectedTag     = null;
-      activeStoryId   = null;
+// ── 選擇縣市 ─────────────────────────────────────
+async function selectCounty(id, name) {
+  currentCountyId = id;
+  selectedTag     = null;
+  activeStoryId   = null;
 
-      // 更新 SVG 選中狀態
-      document.querySelectorAll('#counties-group path').forEach(p => p.classList.remove('selected'));
-      const el = $('county-' + id);
-      if (el) el.classList.add('selected');
+  document.querySelectorAll('#counties-group path').forEach(p => p.classList.remove('selected'));
+  const el = $('county-' + id);
+  if (el) el.classList.add('selected');
 
-      // 更新 focus 標題
-      $('focusName').textContent = name;
-      $('slCountyName').textContent = `【${name}】異事錄`;
+  $('focusName').textContent    = name;
+  $('slCountyName').textContent = `【${name}】異事錄`;
 
-      // 載入故事
-      currentStories = await fetch_json(`/api/stories/${id}`);
-      $('slCount').textContent = `${currentStories.length} 則記載`;
-      $('slCountyCount').textContent = `(${currentStories.length})`;
+  currentStories = await fetch_json(`/api/stories/${id}`);
+  $('slCount').textContent       = `${currentStories.length} 則記載`;
+  $('slCountyCount').textContent = `(${currentStories.length})`;
 
-      renderTags();
-      renderStoryList(currentStories);
-      clearDetail();
-    }
+  renderTags();
+  renderStoryList(currentStories);
+  clearDetail();
+}
 
-    // ── 標籤篩選 ─────────────────────────────────────
-    function renderTags() {
-      const bar = $('tagBar');
-      bar.innerHTML = '';
-      const tags = [...new Set(currentStories.map(s => s.tag))];
-      if (!tags.length) return;
+// ── 標籤篩選 ─────────────────────────────────────
+function renderTags() {
+  const bar = $('tagBar');
+  bar.innerHTML = '';
+  const tags = [...new Set(currentStories.map(s => s.tag))];
+  if (!tags.length) return;
+  addTagBtn('全部', null, true, bar);
+  tags.forEach(t => addTagBtn(t, t, false, bar));
+}
 
-      addTagBtn('全部', null, true, bar);
-      tags.forEach(t => addTagBtn(t, t, false, bar));
-    }
+function addTagBtn(label, val, active, container) {
+  const btn = document.createElement('button');
+  btn.className  = 'tag-btn' + (active ? ' active' : '');
+  btn.textContent = label;
+  btn.onclick = () => {
+    selectedTag = val;
+    document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filtered = val ? currentStories.filter(s => s.tag === val) : currentStories;
+    renderStoryList(filtered);
+  };
+  container.appendChild(btn);
+}
 
-    function addTagBtn(label, val, active, container) {
-      const btn = document.createElement('button');
-      btn.className = 'tag-btn' + (active ? ' active' : '');
-      btn.textContent = label;
-      btn.onclick = () => {
-        selectedTag = val;
-        document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const filtered = val ? currentStories.filter(s => s.tag === val) : currentStories;
-        renderStoryList(filtered);
-      };
-      container.appendChild(btn);
-    }
+// ── 故事列表 ─────────────────────────────────────
+function renderStoryList(stories) {
+  const box = $('storyCards');
+  if (!stories.length) {
+    box.innerHTML = '<div class="empty-note" style="grid-column:span 2"><p>此區域暫無該分類的靈異記載。</p></div>';
+    return;
+  }
+  box.innerHTML = '';
+  stories.forEach(s => {
+    const card       = document.createElement('div');
+    card.className   = 'story-card' + (s.id === activeStoryId ? ' active' : '');
+    card.id          = 'sc-' + s.id;
+    card.onclick     = () => showDetail(s);
+    card.innerHTML   = `
+      <div class="sc-top">
+        <div class="sc-title">${s.title}</div>
+        <div class="sc-tag">${s.tag}</div>
+      </div>
+      <div class="sc-loc">📍 ${s.location?.display ?? s.location}</div>
+      <div class="sc-flames">${flames(s.scaryLevel, 'flame')}</div>
+    `;
+    box.appendChild(card);
+  });
+}
 
-    // ── 故事列表 ─────────────────────────────────────
-    function renderStoryList(stories) {
-      const box = $('storyCards');
-      if (!stories.length) {
-        box.innerHTML = '<div class="empty-note" style="grid-column:span 2"><p>此區域暫無該分類的靈異記載。</p></div>';
-        return;
-      }
-      box.innerHTML = '';
-      stories.forEach(s => {
-        const card = document.createElement('div');
-        card.className = 'story-card' + (s.id === activeStoryId ? ' active' : '');
-        card.id = 'sc-' + s.id;
-        card.onclick = () => showDetail(s);
-        card.innerHTML = `
-          <div class="sc-top">
-            <div class="sc-title">${s.title}</div>
-            <div class="sc-tag">${s.tag}</div>
-          </div>
-          <div class="sc-loc">📍 ${s.location?.display ?? s.location}</div>
-          <div class="sc-flames">${flames(s.scaryLevel, 'flame')}</div>
-        `;
-        box.appendChild(card);
-      });
-    }
+// ── 故事詳情 ─────────────────────────────────────
+function showDetail(s) {
+  activeStoryId   = s.id;
+  ttsCurrentStory = s;   // ← 記住當前故事供 TTS 重播使用
 
-    // ── 故事詳情 ─────────────────────────────────────
-    function showDetail(s) {
-      activeStoryId = s.id;
-      document.querySelectorAll('.story-card').forEach(c => c.classList.remove('active'));
-      const card = $('sc-' + s.id);
-      if (card) { card.classList.add('active'); card.scrollIntoView({block:'nearest'}); }
+  document.querySelectorAll('.story-card').forEach(c => c.classList.remove('active'));
+  const card = $('sc-' + s.id);
+  if (card) { card.classList.add('active'); card.scrollIntoView({block:'nearest'}); }
 
-      $('detailEmpty').style.display = 'none';
-      const inner = $('detailInner');
-      inner.style.display = 'block';
+  $('detailEmpty').style.display = 'none';
+  const inner = $('detailInner');
+  inner.style.display = 'block';
 
-      const paras = s.content.split(/\n+/).filter(p => p.trim()).map(p => `<p>${p}</p>`).join('');
+  const paras = s.content.split(/\n+/).filter(p => p.trim()).map(p => `<p>${p}</p>`).join('');
 
-      inner.innerHTML = `
-        <div class="d-meta">
-          <div class="d-tag">${s.tag}</div>
-          <div class="d-id">ID: ${s.id.toUpperCase()}</div>
-        </div>
-        <div class="d-title">${s.title}</div>
-        <div class="d-scary">
-          <div class="d-scary-label">凶險指數</div>
-          <div class="d-flames">${flames(s.scaryLevel, 'd-flame')}</div>
-        </div>
-        <hr class="d-divider">
-        <div class="d-loc">📍 <span><strong>邪祟現世地：</strong>${s.location?.display ?? s.location}</span></div>
-        <div class="d-summary">「${s.summary}」</div>
-        <div class="d-body">${paras}</div>
-        <div class="d-warn">
-          <div class="d-warn-icon">⚠</div>
-          <div class="d-warn-text">民俗傳說僅供休閒與文化考證，深夜請勿輕易前往事發地點探險，生人迴避，切勿以身試法。</div>
-        </div>
-      `;
+  inner.innerHTML = `
+    <div class="d-meta">
+      <div class="d-tag">${s.tag}</div>
+      <div class="d-id">ID: ${s.id.toUpperCase()}</div>
+    </div>
+    <div class="d-title">${s.title}</div>
+    <div class="d-scary">
+      <div class="d-scary-label">凶險指數</div>
+      <div class="d-flames">${flames(s.scaryLevel, 'd-flame')}</div>
+    </div>
+    <hr class="d-divider">
+    ${_buildTTSBlock()}
+    <div class="d-loc">📍 <span><strong>邪祟現世地：</strong>${s.location?.display ?? s.location}</span></div>
+    <div class="d-summary">「${s.summary}」</div>
+    <div class="d-body">${paras}</div>
+    <div class="d-warn">
+      <div class="d-warn-icon">⚠</div>
+      <div class="d-warn-text">民俗傳說僅供休閒與文化考證，深夜請勿輕易前往事發地點探險，生人迴避，切勿以身試法。</div>
+    </div>
+  `;
 
-      $('storyDetail').scrollTop = 0;
-    }
+  $('storyDetail').scrollTop = 0;
 
-    function clearDetail() {
-      activeStoryId = null;
-      $('detailEmpty').style.display = 'flex';
-      $('detailInner').style.display = 'none';
-    }
+  // ── 自動開始朗讀 ─────────────────────────────────
+  // 用 setTimeout 確保 DOM 渲染完成後再啟動，
+  // 也讓 iOS Safari 等需要短暫延遲的環境正常運作
+  setTimeout(() => speakStory(s), 100);
+}
 
-    // ── 音效 ─────────────────────────────────────────
-    function toggleSound() {
-      if (!audio) {
-        audio        = new Audio('/audio/ghost_bgm.mp3');
-        audio.loop   = true;
-        audio.volume = 0.3;
-        audio.play()
-          .then(() => { isPlaying = true; updateSoundUI(); })
-          .catch(err => {
-            console.error('音效載入失敗:', err);
-            alert('音效載入失敗，請確認 ghost_bgm.mp3 已放在專案根目錄。');
-          });
-        return; // 等 promise 回來再更新 UI
-      }
-      if (isPlaying) {
-        audio.pause();
-        isPlaying = false;
-      } else {
-        audio.play().catch(err => console.error('音效播放失敗:', err));
+function clearDetail() {
+  activeStoryId = null;
+
+  // 切換縣市或關閉故事時，停止朗讀
+  _cancelSpeech();
+  ttsCurrentStory = null;
+
+  $('detailEmpty').style.display = 'flex';
+  $('detailInner').style.display = 'none';
+}
+
+// ── 背景音效 ─────────────────────────────────────
+function toggleSound() {
+  if (!audio) {
+    audio = new Audio('/audio/ghost_bgm.mp3');
+    audio.loop   = true;
+    audio.volume = 0;  // 從靜音淡入
+    audio.play()
+      .then(() => {
         isPlaying = true;
-      }
-      updateSoundUI();
-    }
-    function updateSoundUI() {
-      const btn = $('soundBtn');
-      $('soundIcon').textContent  = isPlaying ? '🔊' : '🔇';
-      $('soundLabel').textContent = isPlaying ? '靈異氛圍：啟動中' : '開啟靈異氛圍音效';
-      btn.classList.toggle('on', isPlaying);
-    }
+        updateSoundUI();
+        // 淡入效果：0 → 0.3，共 1.5 秒
+        let vol = 0;
+        const fadeIn = setInterval(() => {
+          vol = Math.min(vol + 0.02, 0.3);
+          audio.volume = vol;
+          if (vol >= 0.3) clearInterval(fadeIn);
+        }, 100);
+      })
+      .catch(err => {
+        console.error('音效載入失敗:', err);
+        alert('音效載入失敗，請確認 ghost_bgm.mp3 已放在專案根目錄。');
+      });
+    return;
+  }
+  if (isPlaying) {
+    audio.pause();
+    isPlaying = false;
+  } else {
+    audio.play().catch(err => console.error('音效播放失敗:', err));
+    isPlaying = true;
+  }
+  updateSoundUI();
+}
 
-    // ── 啟動 ─────────────────────────────────────────
-    init();
-  </script>
+function updateSoundUI() {
+  const btn = $('soundBtn');
+  $('soundIcon').textContent  = isPlaying ? '🔊' : '🔇';
+  $('soundLabel').textContent = isPlaying ? '靈異氛圍：啟動中' : '開啟靈異氛圍音效';
+  btn.classList.toggle('on', isPlaying);
+}
+
+// ── 啟動 ─────────────────────────────────────────
+init();
+</script>
 </body>
 </html>
