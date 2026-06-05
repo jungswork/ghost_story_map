@@ -56,9 +56,8 @@ main { flex: 1; overflow: hidden; display: grid; grid-template-columns: 420px 1f
 .ph-focus-name { font-size: 14px; font-weight: 700; color: var(--red); letter-spacing: .12em; }
 .map-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 12px; overflow: hidden; position: relative; }
 
-/* ── SVG 地圖：改為高度撐滿容器，不再用 max-width 限制 ── */
+/* ── SVG 地圖 ── */
 #taiwan-svg { height: 100%; width: auto; max-width: 100%; cursor: pointer; }
-
 #taiwan-svg path { fill: #1a1208; stroke: #7a6050; stroke-width: 2; transition: fill .2s, stroke .2s, filter .2s; }
 #taiwan-svg path:hover { fill: #3d2a10; stroke: var(--gold); stroke-width: 2; filter: drop-shadow(0 0 6px rgba(201,146,42,.4)); }
 #taiwan-svg path.selected { fill: rgba(139,0,0,.3); stroke: var(--red); stroke-width: 2.5; filter: drop-shadow(0 0 8px rgba(139,0,0,.5)); }
@@ -131,10 +130,10 @@ main { flex: 1; overflow: hidden; display: grid; grid-template-columns: 420px 1f
 .d-warn-icon { flex-shrink: 0; font-size: 13px; color: var(--gold); margin-top: 2px; }
 .d-warn-text { font-size: 11px; color: rgba(201,146,42,.65); letter-spacing: .06em; line-height: 1.75; }
 
-/* ── [新增] 已讀標記 ── */
+/* ── 已讀標記 ── */
 .sc-read-tag { font-family: var(--mono); font-size: 8px; border: 1px solid var(--red); padding: 2px 5px; color: var(--red); background: rgba(139,0,0,.1); white-space: nowrap; flex-shrink: 0; letter-spacing: .04em; }
 
-/* ── [新增] 閱覽紀錄（detailEmpty 內） ── */
+/* ── 閱覽紀錄 ── */
 .hist-wrap { width: 100%; padding: 0 22px 20px; }
 .hist-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .hist-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: .15em; }
@@ -147,7 +146,7 @@ main { flex: 1; overflow: hidden; display: grid; grid-template-columns: 420px 1f
 .hist-item-county { font-size: 10px; color: var(--dim); }
 .hist-item-time { font-family: var(--mono); font-size: 11px; color: var(--dim); margin-left: auto; }
 
-/* ── [新增] TTS 語音朗讀控制列 ── */
+/* ── TTS 控制列 ── */
 .d-tts { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; padding: 7px 11px; border: 1px solid var(--border); background: rgba(139,0,0,.03); }
 .d-tts-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: .14em; flex-shrink: 0; }
 .d-tts-btn { background: transparent; border: 1px solid var(--border); color: var(--dim); font-size: 11px; width: 26px; height: 26px; cursor: pointer; font-family: var(--serif); transition: all .2s; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -203,7 +202,6 @@ footer p + p { margin-top: 2px; opacity: .55; }
         <div class="tt-name" id="tooltip-name"></div>
         <div class="tt-line"></div>
       </div>
-      <!-- viewBox 改為只框主島+澎湖範圍，金門連江由 JS 移入左下角 inset -->
       <svg id="taiwan-svg" viewBox="260 290 745 1005" xmlns="http://www.w3.org/2000/svg" aria-label="台灣地圖">
         <g id="counties-group"></g>
       </svg>
@@ -222,7 +220,6 @@ footer p + p { margin-top: 2px; opacity: .55; }
 
   <!-- ── 右側：故事列表 + 詳情 ── -->
   <div class="story-panel">
-    <!-- 故事列表 -->
     <div class="story-list-wrap">
       <div class="sl-head">
         <div>
@@ -242,11 +239,8 @@ footer p + p { margin-top: 2px; opacity: .55; }
       </div>
     </div>
 
-    <!-- 故事詳情 -->
     <div class="story-detail" id="storyDetail">
-      <div class="detail-empty" id="detailEmpty">
-        <!-- 由 renderHistory() 動態填入 -->
-      </div>
+      <div class="detail-empty" id="detailEmpty"></div>
       <div class="detail-inner" id="detailInner" style="display:none;"></div>
     </div>
   </div>
@@ -258,7 +252,7 @@ footer p + p { margin-top: 2px; opacity: .55; }
 </footer>
 
 <script>
-// ── 狀態 ────────────────────────────────────────
+// ── 狀態 ──
 let currentCountyId = null;
 let currentStories  = [];
 let activeStoryId   = null;
@@ -267,7 +261,7 @@ let countyCountMap  = {};
 let audio           = null;
 let isPlaying       = false;
 
-// ── 工具函式 ─────────────────────────────────────
+// ── 工具函式 ──
 const $ = id => document.getElementById(id);
 const fetch_json = url => fetch(url).then(r => r.json());
 
@@ -277,10 +271,7 @@ function flames(n, cls) {
   ).join('');
 }
 
-// ════════════════════════════════════════════════
-//  ██████╗ 閱覽紀錄模組（localStorage）
-// ════════════════════════════════════════════════
-
+// ── 閱覽紀錄模組 ──
 const HISTORY_KEY = 'ghost_story_history';
 const HISTORY_MAX = 20;
 
@@ -375,23 +366,16 @@ async function jumpToStory(storyId, countyId) {
   if (story) showDetail(story);
 }
 
-// ════════════════════════════════════════════════
-//  ██████╗ TTS  語音朗讀模組
-// ════════════════════════════════════════════════
-
+// ── TTS 語音朗讀模組 ──
 let ttsState        = 'idle';
 let ttsUtterance    = null;
 let ttsCurrentStory = null;
 let ttsResumeTimer  = null;
 let ttsVoices       = [];
 
-function isTTSSupported() {
-  return 'speechSynthesis' in window;
-}
+function isTTSSupported() { return 'speechSynthesis' in window; }
 
-function _loadVoices() {
-  ttsVoices = speechSynthesis.getVoices();
-}
+function _loadVoices() { ttsVoices = speechSynthesis.getVoices(); }
 if (isTTSSupported()) {
   speechSynthesis.addEventListener('voiceschanged', _loadVoices);
   _loadVoices();
@@ -402,17 +386,17 @@ function speakStory(s) {
   _cancelSpeech();
   ttsCurrentStory = s;
   const text = `${s.title}。${s.summary}。${s.content.replace(/\n+/g, '。')}`;
-  ttsUtterance          = new SpeechSynthesisUtterance(text);
-  ttsUtterance.lang     = 'zh-TW';
-  ttsUtterance.rate     = 0.82;
-  ttsUtterance.pitch    = 0.88;
-  ttsUtterance.volume   = 1.0;
+  ttsUtterance         = new SpeechSynthesisUtterance(text);
+  ttsUtterance.lang    = 'zh-TW';
+  ttsUtterance.rate    = 0.75;
+  ttsUtterance.pitch   = 0.5;
+  ttsUtterance.volume  = 1.0;
   ttsUtterance.voice =
     ttsVoices.find(v => v.name === 'Microsoft Yating - Chinese (Traditional, Taiwan)') ||
     ttsVoices.find(v => v.name === 'Meijia') ||
     ttsVoices.find(v => v.lang === 'zh-TW') ||
-    ttsVoices.find(v => v.lang.startsWith('zh')) ||
-    null;
+    ttsVoices.find(v => v.lang.startsWith('zh')) || null;
+    
   ttsUtterance.onstart = () => { ttsState = 'playing'; _updateTTSUI(); _startChromeWorkaround(); };
   ttsUtterance.onend   = () => { ttsState = 'idle'; ttsUtterance = null; _updateTTSUI(); _stopChromeWorkaround(); };
   ttsUtterance.onerror = (e) => {
@@ -488,9 +472,7 @@ function _buildTTSBlock() {
     </div>`;
 }
 
-// ════════════════════════════════════════════════
-//  初始化 & 地圖
-// ════════════════════════════════════════════════
+// ── 初始化 & 地圖 ──
 async function init() {
   const [mapData, stats] = await Promise.all([
     fetch_json('/api/map-data'),
@@ -501,7 +483,7 @@ async function init() {
   renderMap(mapData);
 }
 
-// ── SVG helper ───────────────────────────────────
+// SVG helper
 function _svgEl(tag, attrs) {
   const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
   Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
@@ -512,33 +494,19 @@ function renderMap(counties) {
   const g = $('counties-group');
   g.innerHTML = '';
 
-  // ── 離島 inset 設定 ─────────────────────────────
-  // viewBox = "260 290 745 1005"，顯示範圍 x:260-1005, y:290-1295
-  //
-  // transform 公式（translate 先算好讓框左上角落在 viewBox 內）：
-  //   最終座標 = 原始座標 × scale + translate
-  //   → translate = 目標座標 - 原始座標 × scale
-  //
-  // 金門：目標框左上角 (265, 950)，原始框左上角 (0, 408)，scale=1.5
-  //   tx = 265 - 0×1.5 = 265
-  //   ty = 950 - 408×1.5 = 338
-  //
-  // 連江：目標框左上角 (265, 300)，原始框左上角 (450, 45)，scale=1.5
-  //   tx = 265 - 450×1.5 = -410
-  //   ty = 300 - 45×1.5  =  233
+  // ── 離島 Inset 設定 ──
   const INSET = {
     'kinmen-county': {
-      // getBBox: x:1, y:407.6, w:333.3, h:175.2 → 加 5px padding
-      transform: 'translate(265, 338) scale(1.5)',
-      frame: { x: -3, y: 402, w: 344, h: 186 },
-      label: '金門', lx: 1, ly: 598,
+      scale: 1.8,
+      transform: 'translate(279, 195) scale(1.8)', 
+      frame: { x: -5, y: 475, w: 110, h: 110 },
+      label: '金門', lx: 2, ly: 495, // 移至框內左上角避開島嶼重疊
     },
     'lienchiang-county': {
-      // getBBox: x:449.1, y:1, w:156.2, h:129.3 → 加 5px padding
-      // ty 從 233 改為 294，讓 y:1 的頂部不被 viewBox 裁切
-      transform: 'translate(-410, 294) scale(1.5)',
-      frame: { x: 447, y: 0, w: 167, h: 140 },
-      label: '連江', lx: 449, ly: 130,
+      scale: 1.6,
+      transform: 'translate(-442, 318) scale(1.6)', 
+      frame: { x: 445, y: -5, w: 165, h: 140 }, 
+      label: '連江', lx: 452, ly: 20, // 移至框內左上角避開島嶼重疊
     },
   };
 
@@ -555,26 +523,35 @@ function renderMap(counties) {
 
     const inset = INSET[c.id];
     if (inset) {
-      // 離島：路徑＋框＋標籤包進同一 <g>，transform 一起套用
       const grp = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       grp.setAttribute('transform', inset.transform);
 
-      const rect = _svgEl('rect', {
+      // 1. 氛圍底框（純保留虛線及底色）
+      const bgRect = _svgEl('rect', {
         x: inset.frame.x, y: inset.frame.y,
         width: inset.frame.w, height: inset.frame.h,
-        fill: 'none', stroke: '#6a5040',
-        'stroke-width': '0.8', 'stroke-dasharray': '4,3',
+        fill: 'rgba(139,0,0,0.04)',
+        stroke: 'rgba(201,146,42,0.4)',
+        'stroke-width': 1.5 / inset.scale,
+        'stroke-dasharray': (4 / inset.scale) + ',' + (4 / inset.scale),
+        rx: 4 / inset.scale,
       });
+      bgRect.style.pointerEvents = 'none';
 
+      // 2. 金色主題標籤 (字體放大兩倍)
       const txt = _svgEl('text', {
         x: inset.lx, y: inset.ly,
-        'font-size': '12', fill: '#9a8070',
-        'font-family': 'serif', 'letter-spacing': '3',
+        'font-size': 24 / inset.scale, 
+        fill: '#c9922a',
+        'font-family': 'var(--serif)',
+        'font-weight': 'bold',
+        'letter-spacing': 4 / inset.scale,
       });
       txt.textContent = inset.label;
+      txt.style.pointerEvents = 'none';
 
+      grp.appendChild(bgRect);
       grp.appendChild(path);
-      grp.appendChild(rect);
       grp.appendChild(txt);
       g.appendChild(grp);
     } else {
@@ -591,7 +568,7 @@ function hideTooltip() {
   $('map-tooltip').classList.remove('show');
 }
 
-// ── 選擇縣市 ─────────────────────────────────────
+// ── 選擇縣市 ──
 async function selectCounty(id, name) {
   currentCountyId = id;
   selectedTag     = null;
@@ -613,7 +590,7 @@ async function selectCounty(id, name) {
   clearDetail();
 }
 
-// ── 標籤篩選 ─────────────────────────────────────
+// ── 標籤篩選 ──
 function renderTags() {
   const bar = $('tagBar');
   bar.innerHTML = '';
@@ -637,7 +614,6 @@ function addTagBtn(label, val, active, container) {
   container.appendChild(btn);
 }
 
-// ── 即時更新單張卡片的已讀標籤 ─────────────────────
 function _markCardRead(id) {
   const card = $('sc-' + id);
   if (!card) return;
@@ -650,7 +626,7 @@ function _markCardRead(id) {
   }
 }
 
-// ── 故事列表 ─────────────────────────────────────
+// ── 故事列表 ──
 function renderStoryList(stories) {
   const box = $('storyCards');
   if (!stories.length) {
@@ -676,7 +652,7 @@ function renderStoryList(stories) {
   });
 }
 
-// ── 故事詳情 ─────────────────────────────────────
+// ── 故事詳情 ──
 function showDetail(s) {
   activeStoryId   = s.id;
   ttsCurrentStory = s;
@@ -727,7 +703,7 @@ function clearDetail() {
   $('detailInner').style.display = 'none';
 }
 
-// ── 背景音效 ─────────────────────────────────────
+// ── 背景音效 ──
 function toggleSound() {
   if (!audio) {
     audio = new Audio('/audio/ghost_bgm.mp3');
