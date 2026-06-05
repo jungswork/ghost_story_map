@@ -55,8 +55,11 @@ main { flex: 1; overflow: hidden; display: grid; grid-template-columns: 420px 1f
 .ph-focus-label { font-family: var(--mono); font-size: 8px; color: var(--muted); letter-spacing: .12em; }
 .ph-focus-name { font-size: 14px; font-weight: 700; color: var(--red); letter-spacing: .12em; }
 .map-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 12px; overflow: hidden; position: relative; }
-#taiwan-svg { width: 100%; max-width: 360px; height: auto; drop-shadow: 0 15px 30px rgba(0,0,0,.8); cursor: pointer; }
-#taiwan-svg path { fill: #1a1208; stroke: #4a3a2a; stroke-width: 1.5; transition: fill .2s, stroke .2s, filter .2s; }
+
+/* ── SVG 地圖：改為高度撐滿容器，不再用 max-width 限制 ── */
+#taiwan-svg { height: 100%; width: auto; max-width: 100%; cursor: pointer; }
+
+#taiwan-svg path { fill: #1a1208; stroke: #7a6050; stroke-width: 2; transition: fill .2s, stroke .2s, filter .2s; }
 #taiwan-svg path:hover { fill: #3d2a10; stroke: var(--gold); stroke-width: 2; filter: drop-shadow(0 0 6px rgba(201,146,42,.4)); }
 #taiwan-svg path.selected { fill: rgba(139,0,0,.3); stroke: var(--red); stroke-width: 2.5; filter: drop-shadow(0 0 8px rgba(139,0,0,.5)); }
 #taiwan-svg path.has-stories { fill: #1e150a; }
@@ -145,48 +148,12 @@ main { flex: 1; overflow: hidden; display: grid; grid-template-columns: 420px 1f
 .hist-item-time { font-family: var(--mono); font-size: 11px; color: var(--dim); margin-left: auto; }
 
 /* ── [新增] TTS 語音朗讀控制列 ── */
-.d-tts {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
-  padding: 7px 11px;
-  border: 1px solid var(--border);
-  background: rgba(139,0,0,.03);
-}
-.d-tts-label {
-  font-family: var(--mono);
-  font-size: 9px;
-  color: var(--muted);
-  letter-spacing: .14em;
-  flex-shrink: 0;
-}
-.d-tts-btn {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--dim);
-  font-size: 11px;
-  width: 26px;
-  height: 26px;
-  cursor: pointer;
-  font-family: var(--serif);
-  transition: all .2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
+.d-tts { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; padding: 7px 11px; border: 1px solid var(--border); background: rgba(139,0,0,.03); }
+.d-tts-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: .14em; flex-shrink: 0; }
+.d-tts-btn { background: transparent; border: 1px solid var(--border); color: var(--dim); font-size: 11px; width: 26px; height: 26px; cursor: pointer; font-family: var(--serif); transition: all .2s; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .d-tts-btn:hover { border-color: var(--border-hi); color: var(--red); background: rgba(139,0,0,.08); }
 .d-tts-btn.on { border-color: var(--red); color: var(--red); background: rgba(139,0,0,.1); }
-.d-tts-status {
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: .1em;
-  margin-left: auto;
-  opacity: 0;
-  transition: opacity .3s;
-  white-space: nowrap;
-}
+.d-tts-status { font-family: var(--mono); font-size: 9px; letter-spacing: .1em; margin-left: auto; opacity: 0; transition: opacity .3s; white-space: nowrap; }
 .d-tts-status.show { opacity: 1; color: var(--red); }
 .d-tts-status.show.paused { color: var(--gold); }
 @keyframes tts-blink { 0%,100%{opacity:1} 50%{opacity:.25} }
@@ -236,7 +203,8 @@ footer p + p { margin-top: 2px; opacity: .55; }
         <div class="tt-name" id="tooltip-name"></div>
         <div class="tt-line"></div>
       </div>
-      <svg id="taiwan-svg" viewBox="0 0 1000 1295" xmlns="http://www.w3.org/2000/svg" aria-label="台灣地圖">
+      <!-- viewBox 改為只框主島+澎湖範圍，金門連江由 JS 移入左下角 inset -->
+      <svg id="taiwan-svg" viewBox="260 290 745 1005" xmlns="http://www.w3.org/2000/svg" aria-label="台灣地圖">
         <g id="counties-group"></g>
       </svg>
     </div>
@@ -316,13 +284,11 @@ function flames(n, cls) {
 const HISTORY_KEY = 'ghost_story_history';
 const HISTORY_MAX = 20;
 
-/** 從 localStorage 取出紀錄陣列 */
 function getHistory() {
   try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
   catch { return []; }
 }
 
-/** 新增一筆閱覽紀錄（同一則故事只保留最新一次） */
 function addToHistory(s) {
   const countyName = $('focusName').textContent || '';
   let hist = getHistory().filter(item => item.id !== s.id);
@@ -337,23 +303,19 @@ function addToHistory(s) {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(hist.slice(0, HISTORY_MAX)));
 }
 
-/** 清除全部紀錄 */
 function clearHistory() {
   localStorage.removeItem(HISTORY_KEY);
   renderHistory();
-  // 重新渲染故事卡，清掉已讀小點
   const filtered = selectedTag
     ? currentStories.filter(s => s.tag === selectedTag)
     : currentStories;
   renderStoryList(filtered);
 }
 
-/** 判斷某則故事是否已讀 */
 function isRead(id) {
   return getHistory().some(item => item.id === id);
 }
 
-/** 把時間戳轉成人性化文字 */
 function formatTime(ts) {
   const diff = (Date.now() - ts) / 1000;
   if (diff < 60)    return '剛才';
@@ -363,13 +325,11 @@ function formatTime(ts) {
   return `${d.getMonth() + 1}/${d.getDate()}`;
 }
 
-/** 渲染閱覽紀錄到 detailEmpty 區塊 */
 function renderHistory() {
   const el   = $('detailEmpty');
   const hist = getHistory();
 
   if (!hist.length) {
-    // 沒有紀錄：顯示原始提示
     el.style.justifyContent = 'center';
     el.style.alignItems     = 'center';
     el.innerHTML = `
@@ -380,7 +340,6 @@ function renderHistory() {
     return;
   }
 
-  // 有紀錄：頂部小提示 + 紀錄列表
   el.style.justifyContent = 'flex-start';
   el.style.alignItems     = 'stretch';
   el.innerHTML = `
@@ -406,10 +365,9 @@ function renderHistory() {
   `;
 }
 
-/** 從閱覽紀錄直接跳到指定故事 */
 async function jumpToStory(storyId, countyId) {
   if (currentCountyId !== countyId) {
-    const pathEl    = document.querySelector(`#county-${countyId}`);
+    const pathEl     = document.querySelector(`#county-${countyId}`);
     const countyName = pathEl ? pathEl.dataset.name : countyId;
     await selectCounty(countyId, countyName);
   }
@@ -421,189 +379,111 @@ async function jumpToStory(storyId, countyId) {
 //  ██████╗ TTS  語音朗讀模組
 // ════════════════════════════════════════════════
 
-// ── TTS 狀態 ─────────────────────────────────────
-let ttsState        = 'idle';  // 'idle' | 'playing' | 'paused'
+let ttsState        = 'idle';
 let ttsUtterance    = null;
 let ttsCurrentStory = null;
-let ttsResumeTimer  = null;    // Chrome Bug Workaround 用
-let ttsVoices       = [];      // 預載語音清單快取
+let ttsResumeTimer  = null;
+let ttsVoices       = [];
 
-// ── TTS 支援偵測 ─────────────────────────────────
 function isTTSSupported() {
   return 'speechSynthesis' in window;
 }
 
-// ── 預載語音清單（非同步，頁面啟動時就開始）────────
-// Chrome / Edge 的語音清單是非同步載入的，
-// 必須監聽 voiceschanged 才能確保拿到完整清單。
 function _loadVoices() {
   ttsVoices = speechSynthesis.getVoices();
 }
 if (isTTSSupported()) {
   speechSynthesis.addEventListener('voiceschanged', _loadVoices);
-  _loadVoices(); // 部分瀏覽器同步就有，先呼叫一次
+  _loadVoices();
 }
 
-/**
- * speakStory(s)
- * 開始朗讀指定故事。若已有朗讀進行中，先停止再重新開始。
- * 朗讀順序：標題 → 摘要 → 正文
- */
 function speakStory(s) {
   if (!isTTSSupported()) return;
-
-  // 先停止任何進行中的朗讀
   _cancelSpeech();
   ttsCurrentStory = s;
-
-  // 組合朗讀文字，把換行替換成停頓符號
   const text = `${s.title}。${s.summary}。${s.content.replace(/\n+/g, '。')}`;
-
   ttsUtterance          = new SpeechSynthesisUtterance(text);
   ttsUtterance.lang     = 'zh-TW';
   ttsUtterance.rate     = 0.82;
   ttsUtterance.pitch    = 0.88;
   ttsUtterance.volume   = 1.0;
-  // 優先序：Windows Yating → macOS Meijia → 任何 zh-TW → 任何中文 → 系統預設
-  // ttsVoices 已在頁面啟動時由 voiceschanged 事件預載，確保這裡能拿到完整清單
   ttsUtterance.voice =
     ttsVoices.find(v => v.name === 'Microsoft Yating - Chinese (Traditional, Taiwan)') ||
     ttsVoices.find(v => v.name === 'Meijia') ||
     ttsVoices.find(v => v.lang === 'zh-TW') ||
     ttsVoices.find(v => v.lang.startsWith('zh')) ||
     null;
-
-  ttsUtterance.onstart = () => {
-    ttsState = 'playing';
-    _updateTTSUI();
-    _startChromeWorkaround();
-  };
-
-  ttsUtterance.onend = () => {
-    ttsState = 'idle';
-    ttsUtterance = null;
-    _updateTTSUI();
-    _stopChromeWorkaround();
-  };
-
+  ttsUtterance.onstart = () => { ttsState = 'playing'; _updateTTSUI(); _startChromeWorkaround(); };
+  ttsUtterance.onend   = () => { ttsState = 'idle'; ttsUtterance = null; _updateTTSUI(); _stopChromeWorkaround(); };
   ttsUtterance.onerror = (e) => {
-    // 'interrupted' 是正常取消，不視為錯誤
     if (e.error === 'interrupted' || e.error === 'canceled') return;
     console.warn('TTS 朗讀中斷：', e.error);
-    ttsState = 'idle';
-    _updateTTSUI();
-    _stopChromeWorkaround();
+    ttsState = 'idle'; _updateTTSUI(); _stopChromeWorkaround();
   };
-
   window.speechSynthesis.speak(ttsUtterance);
 }
 
-/**
- * toggleTTS()
- * 暫停 / 繼續 切換（對應畫面上的播放鍵）
- */
 function toggleTTS() {
   if (!isTTSSupported()) return;
-
   if (ttsState === 'idle') {
-    // 閒置狀態：重新播放當前故事
     if (ttsCurrentStory) speakStory(ttsCurrentStory);
   } else if (ttsState === 'playing') {
-    window.speechSynthesis.pause();
-    ttsState = 'paused';
-    _stopChromeWorkaround();
-    _updateTTSUI();
+    window.speechSynthesis.pause(); ttsState = 'paused'; _stopChromeWorkaround(); _updateTTSUI();
   } else if (ttsState === 'paused') {
-    window.speechSynthesis.resume();
-    ttsState = 'playing';
-    _startChromeWorkaround();
-    _updateTTSUI();
+    window.speechSynthesis.resume(); ttsState = 'playing'; _startChromeWorkaround(); _updateTTSUI();
   }
 }
 
-/**
- * stopSpeech()
- * 完全停止朗讀（對應畫面上的停止鍵）
- */
 function stopSpeech() {
   if (!isTTSSupported()) return;
-  _cancelSpeech();
-  ttsCurrentStory = null;
-  _updateTTSUI();
+  _cancelSpeech(); ttsCurrentStory = null; _updateTTSUI();
 }
 
-// ── 內部 helper：取消語音但不清 ttsCurrentStory ─────
 function _cancelSpeech() {
   window.speechSynthesis.cancel();
-  ttsState     = 'idle';
-  ttsUtterance = null;
-  _stopChromeWorkaround();
+  ttsState = 'idle'; ttsUtterance = null; _stopChromeWorkaround();
 }
 
-// ── Chrome Bug Workaround ────────────────────────
-// Chrome 有一個已知 bug：speechSynthesis 在約 15 秒後會自動停止。
-// 解法：每 14 秒呼叫一次 pause() + resume() 讓 Chrome 重置計時器。
 function _startChromeWorkaround() {
   _stopChromeWorkaround();
   ttsResumeTimer = setInterval(() => {
     if (window.speechSynthesis.speaking && ttsState === 'playing') {
-      window.speechSynthesis.pause();
-      window.speechSynthesis.resume();
+      window.speechSynthesis.pause(); window.speechSynthesis.resume();
     }
   }, 14000);
 }
 
 function _stopChromeWorkaround() {
-  if (ttsResumeTimer) {
-    clearInterval(ttsResumeTimer);
-    ttsResumeTimer = null;
-  }
+  if (ttsResumeTimer) { clearInterval(ttsResumeTimer); ttsResumeTimer = null; }
 }
 
-// ── 更新 TTS 按鈕與狀態指示 UI ──────────────────
 function _updateTTSUI() {
   const playBtn  = $('ttsPlay');
   const stopBtn  = $('ttsStop');
   const statusEl = $('ttsStatus');
   if (!playBtn || !stopBtn || !statusEl) return;
-
   if (ttsState === 'playing') {
-    playBtn.textContent = '⏸';
-    playBtn.title       = '暫停朗讀';
-    playBtn.classList.add('on');
-    stopBtn.style.opacity       = '1';
-    stopBtn.style.pointerEvents = 'auto';
-    statusEl.textContent        = '▐▐ 朗讀中';
-    statusEl.className          = 'd-tts-status show reading';
+    playBtn.textContent = '⏸'; playBtn.title = '暫停朗讀'; playBtn.classList.add('on');
+    stopBtn.style.opacity = '1'; stopBtn.style.pointerEvents = 'auto';
+    statusEl.textContent = '▐▐ 朗讀中'; statusEl.className = 'd-tts-status show reading';
   } else if (ttsState === 'paused') {
-    playBtn.textContent = '▶';
-    playBtn.title       = '繼續朗讀';
-    playBtn.classList.add('on');
-    stopBtn.style.opacity       = '1';
-    stopBtn.style.pointerEvents = 'auto';
-    statusEl.textContent        = '‖ 已暫停';
-    statusEl.className          = 'd-tts-status show paused';
+    playBtn.textContent = '▶'; playBtn.title = '繼續朗讀'; playBtn.classList.add('on');
+    stopBtn.style.opacity = '1'; stopBtn.style.pointerEvents = 'auto';
+    statusEl.textContent = '‖ 已暫停'; statusEl.className = 'd-tts-status show paused';
   } else {
-    playBtn.textContent = '▶';
-    playBtn.title       = '朗讀故事';
-    playBtn.classList.remove('on');
-    stopBtn.style.opacity       = '0.3';
-    stopBtn.style.pointerEvents = 'none';
-    statusEl.textContent        = '';
-    statusEl.className          = 'd-tts-status';
+    playBtn.textContent = '▶'; playBtn.title = '朗讀故事'; playBtn.classList.remove('on');
+    stopBtn.style.opacity = '0.3'; stopBtn.style.pointerEvents = 'none';
+    statusEl.textContent = ''; statusEl.className = 'd-tts-status';
   }
 }
 
-// ── 組成 TTS 控制列 HTML（若瀏覽器不支援則回傳空字串）──
 function _buildTTSBlock() {
   if (!isTTSSupported()) return '';
   return `
     <div class="d-tts">
       <span class="d-tts-label">VOICE_READ</span>
       <button class="d-tts-btn" id="ttsPlay" title="朗讀故事" onclick="toggleTTS()">▶</button>
-      <button class="d-tts-btn" id="ttsStop" title="停止朗讀"
-              onclick="stopSpeech()"
-              style="opacity:.3;pointer-events:none">■</button>
+      <button class="d-tts-btn" id="ttsStop" title="停止朗讀" onclick="stopSpeech()" style="opacity:.3;pointer-events:none">■</button>
       <span class="d-tts-status" id="ttsStatus"></span>
     </div>`;
 }
@@ -621,9 +501,47 @@ async function init() {
   renderMap(mapData);
 }
 
+// ── SVG helper ───────────────────────────────────
+function _svgEl(tag, attrs) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+  return el;
+}
+
 function renderMap(counties) {
   const g = $('counties-group');
   g.innerHTML = '';
+
+  // ── 離島 inset 設定 ─────────────────────────────
+  // viewBox = "260 290 745 1005"，顯示範圍 x:260-1005, y:290-1295
+  //
+  // transform 公式（translate 先算好讓框左上角落在 viewBox 內）：
+  //   最終座標 = 原始座標 × scale + translate
+  //   → translate = 目標座標 - 原始座標 × scale
+  //
+  // 金門：目標框左上角 (265, 950)，原始框左上角 (0, 408)，scale=1.5
+  //   tx = 265 - 0×1.5 = 265
+  //   ty = 950 - 408×1.5 = 338
+  //
+  // 連江：目標框左上角 (265, 300)，原始框左上角 (450, 45)，scale=1.5
+  //   tx = 265 - 450×1.5 = -410
+  //   ty = 300 - 45×1.5  =  233
+  const INSET = {
+    'kinmen-county': {
+      // getBBox: x:1, y:407.6, w:333.3, h:175.2 → 加 5px padding
+      transform: 'translate(265, 338) scale(1.5)',
+      frame: { x: -3, y: 402, w: 344, h: 186 },
+      label: '金門', lx: 1, ly: 598,
+    },
+    'lienchiang-county': {
+      // getBBox: x:449.1, y:1, w:156.2, h:129.3 → 加 5px padding
+      // ty 從 233 改為 294，讓 y:1 的頂部不被 viewBox 裁切
+      transform: 'translate(-410, 294) scale(1.5)',
+      frame: { x: 447, y: 0, w: 167, h: 140 },
+      label: '連江', lx: 449, ly: 130,
+    },
+  };
+
   counties.forEach(c => {
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttribute('d', c.path);
@@ -634,7 +552,34 @@ function renderMap(counties) {
     path.addEventListener('click', () => selectCounty(c.id, c.name));
     path.addEventListener('mouseenter', () => showTooltip(c.name));
     path.addEventListener('mouseleave', hideTooltip);
-    g.appendChild(path);
+
+    const inset = INSET[c.id];
+    if (inset) {
+      // 離島：路徑＋框＋標籤包進同一 <g>，transform 一起套用
+      const grp = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      grp.setAttribute('transform', inset.transform);
+
+      const rect = _svgEl('rect', {
+        x: inset.frame.x, y: inset.frame.y,
+        width: inset.frame.w, height: inset.frame.h,
+        fill: 'none', stroke: '#6a5040',
+        'stroke-width': '0.8', 'stroke-dasharray': '4,3',
+      });
+
+      const txt = _svgEl('text', {
+        x: inset.lx, y: inset.ly,
+        'font-size': '12', fill: '#9a8070',
+        'font-family': 'serif', 'letter-spacing': '3',
+      });
+      txt.textContent = inset.label;
+
+      grp.appendChild(path);
+      grp.appendChild(rect);
+      grp.appendChild(txt);
+      g.appendChild(grp);
+    } else {
+      g.appendChild(path);
+    }
   });
 }
 
@@ -680,7 +625,7 @@ function renderTags() {
 
 function addTagBtn(label, val, active, container) {
   const btn = document.createElement('button');
-  btn.className  = 'tag-btn' + (active ? ' active' : '');
+  btn.className   = 'tag-btn' + (active ? ' active' : '');
   btn.textContent = label;
   btn.onclick = () => {
     selectedTag = val;
@@ -714,11 +659,11 @@ function renderStoryList(stories) {
   }
   box.innerHTML = '';
   stories.forEach(s => {
-    const card       = document.createElement('div');
-    card.className   = 'story-card' + (s.id === activeStoryId ? ' active' : '');
-    card.id          = 'sc-' + s.id;
-    card.onclick     = () => showDetail(s);
-    card.innerHTML   = `
+    const card     = document.createElement('div');
+    card.className = 'story-card' + (s.id === activeStoryId ? ' active' : '');
+    card.id        = 'sc-' + s.id;
+    card.onclick   = () => showDetail(s);
+    card.innerHTML = `
       <div class="sc-top">
         ${isRead(s.id) ? '<span class="sc-read-tag">已閱覽</span>' : ''}
         <div class="sc-title">${s.title}</div>
@@ -734,9 +679,9 @@ function renderStoryList(stories) {
 // ── 故事詳情 ─────────────────────────────────────
 function showDetail(s) {
   activeStoryId   = s.id;
-  ttsCurrentStory = s;   // ← 記住當前故事供 TTS 重播使用
-  addToHistory(s);        // ← 寫入閱覽紀錄
-  _markCardRead(s.id);    // ← 即時在卡片上顯示已閱覽標籤
+  ttsCurrentStory = s;
+  addToHistory(s);
+  _markCardRead(s.id);
 
   document.querySelectorAll('.story-card').forEach(c => c.classList.remove('active'));
   const card = $('sc-' + s.id);
@@ -770,21 +715,14 @@ function showDetail(s) {
   `;
 
   $('storyDetail').scrollTop = 0;
-
-  // ── 自動開始朗讀 ─────────────────────────────────
-  // 用 setTimeout 確保 DOM 渲染完成後再啟動，
-  // 也讓 iOS Safari 等需要短暫延遲的環境正常運作
   setTimeout(() => speakStory(s), 100);
 }
 
 function clearDetail() {
   activeStoryId = null;
-
-  // 切換縣市或關閉故事時，停止朗讀
   _cancelSpeech();
   ttsCurrentStory = null;
-
-  renderHistory();               // ← 更新閱覽紀錄顯示
+  renderHistory();
   $('detailEmpty').style.display = 'flex';
   $('detailInner').style.display = 'none';
 }
@@ -794,12 +732,11 @@ function toggleSound() {
   if (!audio) {
     audio = new Audio('/audio/ghost_bgm.mp3');
     audio.loop   = true;
-    audio.volume = 0;  // 從靜音淡入
+    audio.volume = 0;
     audio.play()
       .then(() => {
         isPlaying = true;
         updateSoundUI();
-        // 淡入效果：0 → 0.3，共 1.5 秒
         let vol = 0;
         const fadeIn = setInterval(() => {
           vol = Math.min(vol + 0.02, 0.3);
@@ -831,7 +768,7 @@ function updateSoundUI() {
 }
 
 // ── 啟動 ─────────────────────────────────────────
-init().then(() => renderHistory()); // 頁面啟動時渲染初始狀態
+init().then(() => renderHistory());
 </script>
 </body>
 </html>
