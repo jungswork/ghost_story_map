@@ -743,8 +743,27 @@ function updateSoundUI() {
   btn.classList.toggle('on', isPlaying);
 }
 
-// ── 啟動 ─────────────────────────────────────────
-init().then(() => renderHistory());
+// ── 啟動 ──
+init().then(() => {
+  renderHistory();
+
+  // 【新增】突破瀏覽器自動播放限制：監聽使用者的第一次互動
+  const autoPlayOnInteract = () => {
+    // 如果音樂還沒播放，就觸發播放
+    if (!isPlaying) {
+      toggleSound();
+    }
+    // 成功觸發後，立刻移除監聽器，避免後續點擊重複執行
+    document.removeEventListener('click', autoPlayOnInteract);
+    document.removeEventListener('touchstart', autoPlayOnInteract);
+    document.removeEventListener('keydown', autoPlayOnInteract);
+  };
+
+  // 綁定點擊、觸控、按鍵事件，只要使用者一跟網頁互動，就啟動靈異音效
+  document.addEventListener('click', autoPlayOnInteract);
+  document.addEventListener('touchstart', autoPlayOnInteract);
+  document.addEventListener('keydown', autoPlayOnInteract);
+});
 </script>
 </body>
 </html>
