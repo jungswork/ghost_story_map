@@ -133,9 +133,9 @@ main { flex: 1; overflow: hidden; display: grid; grid-template-columns: 420px 1f
 .d-warn-text { font-size: 11px; color: rgba(201,146,42,.65); letter-spacing: .06em; line-height: 1.75; }
 
 /* ── 排行榜按鈕 ── */
-.rank-btn { font-family: var(--mono); font-size: 10px; padding: 4px 10px; border: 1px solid var(--border); background: transparent; color: var(--dim); cursor: pointer; letter-spacing: .06em; transition: all .2s; flex-shrink: 0; }
-.rank-btn:hover { border-color: var(--border-hi); color: var(--gold); background: rgba(201,146,42,.06); }
-.rank-btn.on { border-color: var(--gold); color: var(--gold); background: rgba(201,146,42,.08); }
+.rank-btn { font-family: var(--mono); font-size: 12px; padding: 5px 10px; border: 1px solid var(--muted); background: transparent; color: var(--muted); cursor: pointer; letter-spacing: .06em; transition: all .2s; flex-shrink: 0; }
+.rank-btn:hover { border-color: var(--muted); color: var(--muted); background: rgba(241,136,6,.06); }
+.rank-btn.on { border-color: var(--muted); color: var(--muted); background: rgba(241,136,6,.08); }
 
 /* ── 排行榜列表 ── */
 .story-cards.rank-mode { grid-template-columns: 1fr; max-height: calc(100vh - 210px); }
@@ -254,7 +254,7 @@ footer p + p { margin-top: 2px; opacity: .55; }
           </div>
           <div class="sl-count" id="slCount"></div>
         </div>
-        <button class="rank-btn" id="rankBtn" onclick="toggleRanking()">🏆 排行</button>
+        <button class="rank-btn" id="rankBtn" onclick="toggleRanking()">👁 排行</button>
       </div>
       <div class="tag-bar" id="tagBar"></div>
       <div class="story-cards" id="storyCards">
@@ -319,7 +319,7 @@ function _enterRankingMode() {
 
 function _exitRankingMode() {
   rankingMode = false;
-  $('rankBtn').textContent = '🏆 排行';
+  $('rankBtn').textContent = '👁 排行';
   $('rankBtn').classList.remove('on');
   $('tagBar').style.display = '';
   $('storyCards').classList.remove('rank-mode');
@@ -330,7 +330,7 @@ function _exitRankingMode() {
     renderTags();
     renderStoryList(currentStories);
   } else {
-    $('slCountyName').textContent = '請點選地圖縣市';
+    $('slCountyName').textContent  = '請點選地圖縣市';
     $('slCountyCount').textContent = '';
     $('storyCards').innerHTML = '<div class="empty-note" style="grid-column:span 2"><p>請點選地圖上的縣市<br>以翻開當地的靈異事件卷軸</p></div>';
   }
@@ -676,7 +676,7 @@ function hideTooltip() {
 async function selectCounty(id, name) {
   if (rankingMode) {
     rankingMode = false;
-    $('rankBtn').textContent = '🏆 排行';
+    $('rankBtn').textContent = '👁 排行';
     $('rankBtn').classList.remove('on');
     $('tagBar').style.display = '';
     $('storyCards').classList.remove('rank-mode');
