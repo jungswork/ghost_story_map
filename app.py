@@ -36,12 +36,11 @@ CORS(app)
 # ── 故事資料夾路徑 ───────────────────────────────────────────
 STORY_DIR = Path("ghost_story")
 
-# ── 台灣地圖 SVG 路徑資料（固定地理資料，不需外部化）──────────
+# ── 台灣地圖 SVG 路徑資料 ──────────
 MAP_DATA = json.loads(Path("map_data/taiwan_map.json").read_text(encoding="utf-8"))
 
 # ── 縣市中文名稱對照表 ───────────────────────────────────────
 COUNTY_NAMES = {c["id"]: c["name"] for c in MAP_DATA}
-
 
 # ── 故事讀取函式 ─────────────────────────────────────────────
 
@@ -80,28 +79,30 @@ def load_all_stories() -> dict[str, list]:
 
 # ── API 路由 ─────────────────────────────────────────────────
 
+# 初始化時把 index.html 這個檔案傳給瀏覽器(本地 : http://localhost:5000/ 就是 "/")
 @app.route("/")
 def index():
     """提供前端 HTML 頁面"""
     return send_from_directory(".", "index.html")
 
+# 提供前端播放背景音效使用
 @app.route("/audio/<path:filename>")
 def serve_audio(filename):
     return send_from_directory(".", filename)
 
-
+# 提供前端 renderMap() 繪製 SVG 台灣地圖使用
 @app.route("/api/map-data")
 def get_map_data():
     """回傳台灣地圖 SVG 路徑資料（22 縣市）"""
     return jsonify(MAP_DATA)
 
-
+# 提供前端顯示縣市選單清單使用（目前未被呼叫）
 @app.route("/api/counties")
 def get_counties():
     """回傳縣市清單（id + 中文名）"""
     return jsonify([{"id": c["id"], "name": c["name"]} for c in MAP_DATA])
 
-
+# 提供前端取得全台故事資料使用（目前未被呼叫）
 @app.route("/api/stories")
 def get_all_stories():
     """回傳全台所有故事"""
@@ -112,14 +113,14 @@ def get_all_stories():
             result.append({**s, "countyName": COUNTY_NAMES.get(county_id, county_id)})
     return jsonify(result)
 
-
+# 提供前端 selectCounty() 點選縣市後載入該縣市故事列表使用
 @app.route("/api/stories/<county_id>")
 def get_stories_by_county(county_id):
     """回傳指定縣市的故事清單"""
     stories = load_all_stories()
     return jsonify(stories.get(county_id, []))
 
-
+# 提供前端 init() 初始化時顯示故事總數與標記有故事的縣市使用
 @app.route("/api/stats")
 def get_stats():
     """回傳統計資訊：故事總數、分類計數、各縣市故事數"""
