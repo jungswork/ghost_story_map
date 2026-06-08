@@ -132,6 +132,28 @@ main { flex: 1; overflow: hidden; display: grid; grid-template-columns: 420px 1f
 .d-warn-icon { flex-shrink: 0; font-size: 13px; color: var(--gold); margin-top: 2px; }
 .d-warn-text { font-size: 11px; color: rgba(201,146,42,.65); letter-spacing: .06em; line-height: 1.75; }
 
+/* ── 排行榜按鈕 ── */
+.rank-btn { font-family: var(--mono); font-size: 10px; padding: 4px 10px; border: 1px solid var(--border); background: transparent; color: var(--dim); cursor: pointer; letter-spacing: .06em; transition: all .2s; flex-shrink: 0; }
+.rank-btn:hover { border-color: var(--border-hi); color: var(--gold); background: rgba(201,146,42,.06); }
+.rank-btn.on { border-color: var(--gold); color: var(--gold); background: rgba(201,146,42,.08); }
+
+/* ── 排行榜列表 ── */
+.story-cards.rank-mode { grid-template-columns: 1fr; max-height: calc(100vh - 210px); }
+.rank-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid transparent; cursor: pointer; transition: all .2s; }
+.rank-item:hover { background: var(--bg-hover); border-color: var(--border); }
+.rank-item.active { background: rgba(139,0,0,.1); border-color: var(--border-hi); }
+.rank-num { font-family: var(--mono); font-size: 13px; font-weight: 700; min-width: 28px; text-align: center; flex-shrink: 0; color: var(--muted); }
+.rank-num.top1 { color: #c9922a; font-size: 15px; }
+.rank-num.top2 { color: #a0a0a0; }
+.rank-num.top3 { color: #8b6040; }
+.rank-info { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.rank-title { font-size: 12px; font-weight: 700; color: var(--text); letter-spacing: .04em; line-height: 1.4; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.rank-item.active .rank-title { color: var(--red); }
+.rank-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rank-county { font-size: 10px; color: var(--dim); }
+.rank-tag { font-family: var(--mono); font-size: 8px; border: 1px solid var(--border); padding: 1px 4px; color: var(--gold); white-space: nowrap; }
+.rank-flames { display: flex; gap: 2px; font-size: 10px; }
+
 /* ── 已讀標記 ── */
 .sc-read-tag { font-family: var(--mono); font-size: 8px; border: 1px solid var(--red); padding: 2px 5px; color: var(--red); background: rgba(139,0,0,.1); white-space: nowrap; flex-shrink: 0; letter-spacing: .04em; }
 
@@ -232,6 +254,7 @@ footer p + p { margin-top: 2px; opacity: .55; }
           </div>
           <div class="sl-count" id="slCount"></div>
         </div>
+        <button class="rank-btn" id="rankBtn" onclick="toggleRanking()">🏆 排行</button>
       </div>
       <div class="tag-bar" id="tagBar"></div>
       <div class="story-cards" id="storyCards">
@@ -271,6 +294,85 @@ function flames(n, cls) {
   return Array.from({length:5}, (_,i) =>
     `<span class="${cls}${i<n?' lit':''}">${i<n?'🔥':'🔥'}</span>`
   ).join('');
+}
+
+// ── 排行榜模組 ──
+let rankingMode     = false;
+let allStoriesCache = null;
+
+async function toggleRanking() {
+  if (rankingMode) { _exitRankingMode(); }
+  else { _enterRankingMode(); await showRanking(); }
+  clearDetail();
+}
+
+function _enterRankingMode() {
+  rankingMode = true;
+  $('rankBtn').textContent = '✕ 返回';
+  $('rankBtn').classList.add('on');
+  $('tagBar').style.display = 'none';
+  $('slCountyName').textContent  = '全台靈異排行榜';
+  $('slCountyCount').textContent = '';
+  $('slCount').textContent       = '';
+  $('storyCards').classList.add('rank-mode');
+}
+
+function _exitRankingMode() {
+  rankingMode = false;
+  $('rankBtn').textContent = '🏆 排行';
+  $('rankBtn').classList.remove('on');
+  $('tagBar').style.display = '';
+  $('storyCards').classList.remove('rank-mode');
+  if (currentCountyId) {
+    $('slCountyName').textContent  = `【${$('focusName').textContent}】異事錄`;
+    $('slCountyCount').textContent = `(${currentStories.length})`;
+    $('slCount').textContent       = `${currentStories.length} 則記載`;
+    renderTags();
+    renderStoryList(currentStories);
+  } else {
+    $('slCountyName').textContent = '請點選地圖縣市';
+    $('slCountyCount').textContent = '';
+    $('storyCards').innerHTML = '<div class="empty-note" style="grid-column:span 2"><p>請點選地圖上的縣市<br>以翻開當地的靈異事件卷軸</p></div>';
+  }
+}
+
+async function showRanking() {
+  const box = $('storyCards');
+  box.innerHTML = '<div class="empty-note" style="grid-column:span 2"><p>召喚靈異檔案中…</p></div>';
+  if (!allStoriesCache) allStoriesCache = await fetch_json('/api/stories');
+  const sorted = [...allStoriesCache].sort((a, b) => {
+    if (b.scaryLevel !== a.scaryLevel) return b.scaryLevel - a.scaryLevel;
+    return a.id.localeCompare(b.id);
+  });
+  _renderRankList(sorted);
+}
+
+function _renderRankList(stories) {
+  const box = $('storyCards');
+  box.innerHTML = '';
+  stories.forEach((s, i) => {
+    const rank    = i + 1;
+    const rankCls = rank === 1 ? 'rank-num top1' : rank === 2 ? 'rank-num top2' : rank === 3 ? 'rank-num top3' : 'rank-num';
+    const item    = document.createElement('div');
+    item.className = 'rank-item' + (s.id === activeStoryId ? ' active' : '');
+    item.id        = 'sc-' + s.id;
+    item.onclick   = () => showDetail(s);
+    item.innerHTML = `
+      <div class="${rankCls}">${rank}</div>
+      <div class="rank-info">
+        <div class="rank-title">
+          ${isRead(s.id) ? '<span class="sc-read-tag">已閱覽</span>' : ''}
+          ${s.title}
+        </div>
+        <div class="rank-meta">
+          <span class="rank-county">📍 ${s.countyName || s.countyId}</span>
+          <span class="rank-tag">${s.tag}</span>
+          <span class="rank-flames">${flames(s.scaryLevel, 'flame')}</span>
+        </div>
+      </div>
+    `;
+    box.appendChild(item);
+  });
 }
 
 // ── 閱覽紀錄模組 ──
@@ -572,6 +674,13 @@ function hideTooltip() {
 
 // ── 選擇縣市 ──
 async function selectCounty(id, name) {
+  if (rankingMode) {
+    rankingMode = false;
+    $('rankBtn').textContent = '🏆 排行';
+    $('rankBtn').classList.remove('on');
+    $('tagBar').style.display = '';
+    $('storyCards').classList.remove('rank-mode');
+  }
   currentCountyId = id;
   selectedTag     = null;
   activeStoryId   = null;
