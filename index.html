@@ -100,7 +100,8 @@ main { flex: 1; overflow: hidden; display: grid; grid-template-columns: 420px 1f
 .sc-tag { font-family: var(--mono); font-size: 8px; border: 1px solid var(--border); padding: 2px 4px; color: var(--gold); white-space: nowrap; flex-shrink: 0; }
 .sc-loc { font-size: 10px; color: var(--dim); }
 .sc-flames { display: flex; gap: 2px; font-size: 10px; }
-.flame { color: var(--muted); } .flame.lit { color: var(--red); }
+.flame     { filter: grayscale(1); opacity: 0.18; }
+.flame.lit { filter: none; opacity: 1; }
 .empty-note { padding: 24px; text-align: center; }
 .empty-note p { font-size: 12px; color: var(--muted); line-height: 1.9; letter-spacing: .08em; }
 
@@ -118,7 +119,8 @@ main { flex: 1; overflow: hidden; display: grid; grid-template-columns: 420px 1f
 .d-scary { display: flex; align-items: center; gap: 9px; margin-bottom: 16px; }
 .d-scary-label { font-family: var(--mono); font-size: 11px; color: var(--dim); letter-spacing: .12em; }
 .d-flames { display: flex; gap: 3px; font-size: 13px; }
-.d-flame.lit { color: var(--red); animation: flicker 1.4s ease-in-out infinite alternate; }
+.d-flame     { filter: grayscale(1); opacity: 0.18; }
+.d-flame.lit { filter: none; opacity: 1; color: var(--red); animation: flicker 1.4s ease-in-out infinite alternate; }
 @keyframes flicker { 0%{opacity:1} 100%{opacity:.5} }
 .d-divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
 .d-loc { display: flex; align-items: flex-start; gap: 8px; background: rgba(139,0,0,.04); border: 1px solid var(--border); padding: 9px 12px; margin-bottom: 14px; font-size: 12px; color: var(--dim); }
