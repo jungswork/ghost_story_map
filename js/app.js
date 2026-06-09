@@ -9,6 +9,16 @@ let isPlaying       = false;
 let isOverviewLoaded = false;
 let globalStoriesMap = {}; //用來記住所有故事的詳細資料
 
+// ── XSS 防護：escape HTML 特殊字元 ──
+function escapeHtml(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 // 切換總覽表顯示/隱藏
 async function toggleOverview() {
   const modal = document.getElementById('overviewModal');
@@ -38,7 +48,7 @@ async function loadOverviewData() {
 // 依據 tag 分組
     const groupedStories = {};
     allStories.forEach(story => {
-      globalStoriesMap[story.id] = story; // 🔥 1. 把故事存進字典，方便點擊時調用
+      globalStoriesMap[story.id] = story; // 把故事存進字典，方便點擊時調用
 
       const tag = story.tag || '未分類';
       if (!groupedStories[tag]) {
@@ -52,13 +62,14 @@ async function loadOverviewData() {
 // 針對每個分類標籤迭代
     for (const [tag, stories] of Object.entries(groupedStories)) {
       // 幫每個 tag 產生一個安全的 HTML ID（去除空格等）
-      const safeTagId = 'tag-' + tag.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '-');
+      const safeTagId = 'tag-' + tag.replace(/[^a-zA-Z0-9一-龥]/g, '-');
+      const safeTag   = escapeHtml(tag);
       
       // 生成折疊按鈕 (Button)
       htmlContent += `
         <div class="overview-group">
           <button class="overview-tag-btn" onclick="toggleTagGroup('${safeTagId}')">
-            <span class="tag-icon">📂</span> ${tag}
+            <span class="tag-icon">📂</span> ${safeTag}
             <span class="tag-count">(${stories.length} 則檔案) ▾</span>
           </button>
           
@@ -81,18 +92,17 @@ async function loadOverviewData() {
         
         htmlContent += `
                 <tr style="cursor: pointer; transition: background 0.3s;" 
-                    onclick="openStoryFromOverview('${s.id}')" 
+                    onclick="openStoryFromOverview('${escapeHtml(s.id)}')" 
                     onmouseover="this.style.background='rgba(220, 38, 38, 0.1)'" 
                     onmouseout="this.style.background='transparent'">
-                  <td>${s.countyName || '未知'}</td>
-                  <td><strong style="color:var(--red);">${s.title}</strong></td>
-                  <td style="color:var(--dim);">${s.summary}</td>
+                  <td>${escapeHtml(s.countyName || '未知')}</td>
+                  <td><strong style="color:var(--red);">${escapeHtml(s.title)}</strong></td>
+                  <td style="color:var(--dim);">${escapeHtml(s.summary)}</td>
                   <td style="letter-spacing:2px; font-size:0.8rem;">${skulls}</td>
                 </tr>
         `;
       });
       
-      // 🔥🔥🔥 關鍵修復：在這裡把表格跟外框關起來，確保下一個分類不會被吃掉！ 🔥🔥🔥
       htmlContent += `
               </tbody>
             </table>
@@ -122,7 +132,7 @@ function toggleTagGroup(tagId) {
   }
 }
 
-// 🔥 新增：從總覽表點擊故事時的處理函式（必須獨立放在外面！）
+// 從總覽表點擊故事時的處理函式
 async function openStoryFromOverview(storyId) {
   const story = globalStoriesMap[storyId];
   if (!story) return;
@@ -130,7 +140,7 @@ async function openStoryFromOverview(storyId) {
   // 1. 關閉總覽彈出視窗
   toggleOverview();
 
-  // 🔥 關鍵修復 1：在等待網路抓資料前，立刻送出無聲指令解鎖瀏覽器語音權限
+  // 關鍵修復：在等待網路抓資料前，立刻送出無聲指令解鎖瀏覽器語音權限
   if ('speechSynthesis' in window) {
     const unlockAudio = new SpeechSynthesisUtterance('');
     unlockAudio.volume = 0;
@@ -150,7 +160,10 @@ async function openStoryFromOverview(storyId) {
 
 // ── 工具函式 ──
 const $ = id => document.getElementById(id);
-const fetch_json = url => fetch(url).then(r => r.json());
+const fetch_json = url => fetch(url).then(r => {
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+});
 
 function flames(n, cls) {
   return Array.from({length:5}, (_,i) =>
@@ -160,13 +173,18 @@ function flames(n, cls) {
 
 // ── 初始化 & 地圖 ──
 async function init() {
-  const [mapData, stats] = await Promise.all([
-    fetch_json('/api/map-data'),
-    fetch_json('/api/stats'),
-  ]);
-  countyCountMap = stats.county_counts || {};
-  $('statsPill').textContent = `已收錄 ${stats.total} 宗異事`;
-  renderMap(mapData);
+  try {
+    const [mapData, stats] = await Promise.all([
+      fetch_json('/api/map-data'),
+      fetch_json('/api/stats'),
+    ]);
+    countyCountMap = stats.county_counts || {};
+    $('statsPill').textContent = `已收錄 ${stats.total} 宗異事`;
+    renderMap(mapData);
+  } catch (err) {
+    console.error('初始化失敗:', err);
+    $('statsPill').textContent = '⚠ 資料載入失敗，請重新整理頁面';
+  }
 }
 
 // SVG helper
@@ -186,13 +204,13 @@ function renderMap(counties) {
       scale: 1.8,
       transform: 'translate(279, 195) scale(1.8)', 
       frame: { x: -5, y: 475, w: 110, h: 110 },
-      label: '金門', lx: 2, ly: 495, // 移至框內左上角避開島嶼重疊
+      label: '金門', lx: 2, ly: 495,
     },
     'lienchiang-county': {
       scale: 1.6,
       transform: 'translate(-442, 318) scale(1.6)', 
       frame: { x: 445, y: -5, w: 165, h: 140 }, 
-      label: '連江', lx: 452, ly: 20, // 移至框內左上角避開島嶼重疊
+      label: '連江', lx: 452, ly: 20,
     },
   };
 
@@ -280,10 +298,10 @@ async function selectCounty(id, name, preventClear = false) {
 
   renderTags();
   renderStoryList(currentStories);
-// 🔥 關鍵修改：如果是從總覽跳過來的（preventClear 為 true），就不要清空畫面跟中斷語音！
+  // 如果是從總覽跳過來的（preventClear 為 true），就不要清空畫面跟中斷語音
   if (!preventClear) {
-  clearDetail();
-}
+    clearDetail();
+  }
 }
 
 // ── 標籤篩選 ──
@@ -335,13 +353,14 @@ function renderStoryList(stories) {
     card.className = 'story-card' + (s.id === activeStoryId ? ' active' : '');
     card.id        = 'sc-' + s.id;
     card.onclick   = () => showDetail(s);
+    const locDisplay = s.location?.display ?? s.location;
     card.innerHTML = `
       <div class="sc-top">
         ${isRead(s.id) ? '<span class="sc-read-tag">已閱覽</span>' : ''}
-        <div class="sc-title">${s.title}</div>
-        <div class="sc-tag">${s.tag}</div>
+        <div class="sc-title">${escapeHtml(s.title)}</div>
+        <div class="sc-tag">${escapeHtml(s.tag)}</div>
       </div>
-      <div class="sc-loc">📍 ${s.location?.display ?? s.location}</div>
+      <div class="sc-loc">📍 ${escapeHtml(locDisplay)}</div>
       <div class="sc-flames">${flames(s.scaryLevel, 'flame')}</div>
     `;
     box.appendChild(card);
@@ -363,22 +382,25 @@ function showDetail(s) {
   const inner = $('detailInner');
   inner.style.display = 'block';
 
-  const paras = s.content.split(/\n+/).filter(p => p.trim()).map(p => `<p>${p}</p>`).join('');
+  const locDisplay = s.location?.display ?? s.location;
+  // content 以換行分段，每段 escape 後包進 <p>
+  const paras = s.content.split(/\n+/).filter(p => p.trim())
+    .map(p => `<p>${escapeHtml(p)}</p>`).join('');
 
   inner.innerHTML = `
     <div class="d-meta">
-      <div class="d-tag">${s.tag}</div>
-      <div class="d-id">ID: ${s.id.toUpperCase()}</div>
+      <div class="d-tag">${escapeHtml(s.tag)}</div>
+      <div class="d-id">ID: ${escapeHtml(s.id.toUpperCase())}</div>
     </div>
-    <div class="d-title">${s.title}</div>
+    <div class="d-title">${escapeHtml(s.title)}</div>
     <div class="d-scary">
       <div class="d-scary-label">凶險指數</div>
       <div class="d-flames">${flames(s.scaryLevel, 'd-flame')}</div>
     </div>
     <hr class="d-divider">
     ${_buildTTSBlock()}
-    <div class="d-loc">📍 <span><strong>邪祟現世地：</strong>${s.location?.display ?? s.location}</span></div>
-    <div class="d-summary">「${s.summary}」</div>
+    <div class="d-loc">📍 <span><strong>邪祟現世地：</strong>${escapeHtml(locDisplay)}</span></div>
+    <div class="d-summary">「${escapeHtml(s.summary)}」</div>
     <div class="d-body">${paras}</div>
     <div class="d-warn">
       <div class="d-warn-icon">⚠</div>
@@ -475,13 +497,13 @@ async function submitNewStory(event) {
 
   // 收集表單資料
   const payload = {
-    countyId: document.getElementById('formCounty').value,
-    title: document.getElementById('formTitle').value,
-    tag: document.getElementById('formTag').value,
+    countyId:  document.getElementById('formCounty').value,
+    title:     document.getElementById('formTitle').value,
+    tag:       document.getElementById('formTag').value,
     scaryLevel: document.getElementById('formScary').value,
-    location: document.getElementById('formLoc').value,
-    summary: document.getElementById('formSummary').value,
-    content: document.getElementById('formContent').value
+    location:  document.getElementById('formLoc').value,
+    summary:   document.getElementById('formSummary').value,
+    content:   document.getElementById('formContent').value
   };
 
   try {
@@ -498,8 +520,9 @@ async function submitNewStory(event) {
       document.getElementById('submitForm').reset(); // 清空表單
       toggleSubmitForm(); // 關閉視窗
       
-      // 重新載入地圖與資料，讓新故事立刻出現
-      isOverviewLoaded = false; 
+      // 重新載入地圖與資料，讓新故事立刻出現（同時清除排行榜 cache）
+      isOverviewLoaded = false;
+      allStoriesCache  = null;
       init(); 
       if (currentCountyId === payload.countyId) {
         selectCounty(payload.countyId, document.getElementById('formCounty').selectedOptions[0].text, true);

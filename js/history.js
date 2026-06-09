@@ -60,6 +60,18 @@ function renderHistory() {
 
   el.style.justifyContent = 'flex-start';
   el.style.alignItems     = 'stretch';
+
+  // 用 escapeHtml 防止 title / countyName 含特殊字元破壞 HTML
+  const itemsHtml = hist.slice(0, 10).map(item => `
+    <div class="hist-item" data-story-id="${escapeHtml(item.id)}" data-county-id="${escapeHtml(item.countyId)}">
+      <div class="hist-item-title">${escapeHtml(item.title)}</div>
+      <div class="hist-item-meta">
+        <span class="hist-item-county">📍 ${escapeHtml(item.countyName || item.countyId)}</span>
+        <span class="hist-item-time">${formatTime(item.timestamp)}</span>
+      </div>
+    </div>
+  `).join('');
+
   el.innerHTML = `
     <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 22px 14px;flex-shrink:0;border-bottom:1px solid var(--border)">
       <div class="skull" style="font-size:46px; color:var(--red); opacity:0.6;">☠</div>
@@ -70,17 +82,17 @@ function renderHistory() {
         <span class="hist-label">RECENT_READS ·  ${hist.length} 則</span>
         <button class="hist-clear" onclick="clearHistory()">清除紀錄</button>
       </div>
-      ${hist.slice(0, 10).map(item => `
-        <div class="hist-item" onclick="jumpToStory('${item.id}','${item.countyId}')">
-          <div class="hist-item-title">${item.title}</div>
-          <div class="hist-item-meta">
-            <span class="hist-item-county">📍 ${item.countyName || item.countyId}</span>
-            <span class="hist-item-time">${formatTime(item.timestamp)}</span>
-          </div>
-        </div>
-      `).join('')}
+      ${itemsHtml}
     </div>
   `;
+
+  // 用事件委派取代 onclick 字串拼接，避免 id 含特殊字元時破壞 HTML
+  el.querySelectorAll('.hist-item').forEach(div => {
+    div.style.cursor = 'pointer';
+    div.addEventListener('click', () => {
+      jumpToStory(div.dataset.storyId, div.dataset.countyId);
+    });
+  });
 }
 
 async function jumpToStory(storyId, countyId) {
