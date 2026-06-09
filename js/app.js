@@ -7,6 +7,7 @@ let countyCountMap  = {};
 let audio           = null;
 let isPlaying       = false;
 let isOverviewLoaded = false;
+let globalStoriesMap = {}; //用來記住所有故事的詳細資料
 
 // 切換總覽表顯示/隱藏
 async function toggleOverview() {
@@ -34,9 +35,11 @@ async function loadOverviewData() {
     if (!res.ok) throw new Error('Network response was not ok');
     const allStories = await res.json();
     
-    // 依據 tag 分組
+// 依據 tag 分組
     const groupedStories = {};
     allStories.forEach(story => {
+      globalStoriesMap[story.id] = story; // 🔥 1. 把故事存進字典，方便點擊時調用
+
       const tag = story.tag || '未分類';
       if (!groupedStories[tag]) {
         groupedStories[tag] = [];
@@ -73,12 +76,16 @@ async function loadOverviewData() {
               <tbody>
       `;
       
-      // 生成該分類下的故事
+// 生成該分類下的故事
       stories.forEach(s => {
         const skulls = '☠'.repeat(s.scaryLevel || 1) + '－'.repeat(5 - (s.scaryLevel || 1));
         
+        // 🔥 2. 在 tr 加上 onclick 事件與滑鼠指標樣式 (cursor: pointer)
         htmlContent += `
-                <tr>
+                <tr style="cursor: pointer; transition: background 0.3s;" 
+                    onclick="openStoryFromOverview('${s.id}')" 
+                    onmouseover="this.style.background='rgba(220, 38, 38, 0.1)'" 
+                    onmouseout="this.style.background='transparent'">
                   <td>${s.countyName || '未知'}</td>
                   <td><strong style="color:var(--red);">${s.title}</strong></td>
                   <td style="color:var(--dim);">${s.summary}</td>
@@ -86,13 +93,6 @@ async function loadOverviewData() {
                 </tr>
         `;
       });
-      
-      htmlContent += `
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `;
     }
     
     htmlContent += '</div>';
@@ -107,6 +107,22 @@ async function loadOverviewData() {
 
 // 點擊分類時：展開或收合該分類的故事列表
 function toggleTagGroup(tagId) {
+  // 🔥 新增：從總覽表點擊故事時的處理函式
+async function openStoryFromOverview(storyId) {
+  const story = globalStoriesMap[storyId];
+  if (!story) return;
+
+  // 1. 關閉總覽彈出視窗
+  toggleOverview();
+
+  // 2. 如果這個故事的發生地，跟目前畫面左側選的縣市不同，自動幫使用者切換過去！
+  if (currentCountyId !== story.countyId) {
+    await selectCounty(story.countyId, story.countyName || '未知');
+  }
+
+  // 3. 展開故事詳情（你原本的 showDetail 裡已經內建了 speakStory()，所以會自動開始朗讀！）
+  showDetail(story);
+  }
   const groupDiv = document.getElementById(tagId);
   // 若為隱藏狀態則顯示，反之亦然
   if (groupDiv.style.display === 'none') {
