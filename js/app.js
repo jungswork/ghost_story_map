@@ -488,47 +488,64 @@ function toggleSubmitForm() {
   }
 }
 
-// 處理表單送出
+// 處理表單送出（透過 Formspree 寄信給開發者）
 async function submitNewStory(event) {
-  event.preventDefault(); // 阻止網頁預設的重新整理行為
+  event.preventDefault();
   const btn = document.getElementById('formSubmitBtn');
   btn.textContent = '傳送中...';
   btn.disabled = true;
 
   // 收集表單資料
+  const countyEl  = document.getElementById('formCounty');
+  const countyName = countyEl.selectedOptions[0]?.text || countyEl.value;
+
+  const storyData = {
+    countyId:   countyEl.value,
+    countyName: countyName,
+    title:      document.getElementById('formTitle').value,
+    tag:        document.getElementById('formTag').value,
+    scaryLevel: parseInt(document.getElementById('formScary').value) || 1,
+    summary:    document.getElementById('formSummary').value,
+    location: {
+      display:  document.getElementById('formLoc').value,
+      district: '',
+      lat:      null,
+      lng:      null
+    },
+    content:    document.getElementById('formContent').value
+  };
+
+  // 組成讓開發者可直接複製的 JSON 字串
+  const jsonPreview = JSON.stringify(storyData, null, 2);
+
+  // Formspree payload：每個欄位都會顯示在 email 中
   const payload = {
-    countyId:  document.getElementById('formCounty').value,
-    title:     document.getElementById('formTitle').value,
-    tag:       document.getElementById('formTag').value,
-    scaryLevel: document.getElementById('formScary').value,
-    location:  document.getElementById('formLoc').value,
-    summary:   document.getElementById('formSummary').value,
-    content:   document.getElementById('formContent').value
+    _subject:    `【新投稿】${storyData.title}（${countyName}）`,
+    縣市:        countyName,
+    標題:        storyData.title,
+    分類:        storyData.tag,
+    恐怖指數:    storyData.scaryLevel,
+    地點:        storyData.location.display,
+    摘要:        storyData.summary,
+    內文:        storyData.content,
+    '--- JSON（直接複製貼入 ghost_story/）---': jsonPreview
   };
 
   try {
-    const res = await fetch('/api/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+    const res = await fetch('https://formspree.io/f/mqeolkzo', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body:    JSON.stringify(payload)
     });
-    
+
     const result = await res.json();
-    
-    if (result.success) {
-      alert('📜 靈異卷軸已成功封印進地圖中！\n感謝你的投稿。');
-      document.getElementById('submitForm').reset(); // 清空表單
-      toggleSubmitForm(); // 關閉視窗
-      
-      // 重新載入地圖與資料，讓新故事立刻出現（同時清除排行榜 cache）
-      isOverviewLoaded = false;
-      allStoriesCache  = null;
-      init(); 
-      if (currentCountyId === payload.countyId) {
-        selectCounty(payload.countyId, document.getElementById('formCounty').selectedOptions[0].text, true);
-      }
+
+    if (result.ok) {
+      alert('📜 靈異卷軸已送出！\n待開發者審核通過後即會出現在地圖上，感謝你的投稿。');
+      document.getElementById('submitForm').reset();
+      toggleSubmitForm();
     } else {
-      alert('⚠ 投稿失敗：' + result.error);
+      alert('⚠ 投稿失敗：' + (result.error || '未知錯誤'));
     }
   } catch (error) {
     console.error('送出錯誤:', error);
