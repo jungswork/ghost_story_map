@@ -260,6 +260,7 @@ footer p + p { margin-top: 2px; opacity: .55; }
 }
 
 .overview-tag-btn {
+  box-sizing: border-box;
   width: 100%;
   background: rgba(220, 38, 38, 0.1);
   border: 1px solid var(--border); /* 使用原本的邊框變數 */
@@ -293,6 +294,7 @@ footer p + p { margin-top: 2px; opacity: .55; }
 
 /* 展開後的故事區塊外框 */
 .overview-stories {
+  box-sizing: border-box;
   border: 1px solid var(--border);
   border-top: none;
   padding: 15px;

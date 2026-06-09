@@ -107,22 +107,6 @@ async function loadOverviewData() {
 
 // 點擊分類時：展開或收合該分類的故事列表
 function toggleTagGroup(tagId) {
-  // 🔥 新增：從總覽表點擊故事時的處理函式
-async function openStoryFromOverview(storyId) {
-  const story = globalStoriesMap[storyId];
-  if (!story) return;
-
-  // 1. 關閉總覽彈出視窗
-  toggleOverview();
-
-  // 2. 如果這個故事的發生地，跟目前畫面左側選的縣市不同，自動幫使用者切換過去！
-  if (currentCountyId !== story.countyId) {
-    await selectCounty(story.countyId, story.countyName || '未知');
-  }
-
-  // 3. 展開故事詳情（你原本的 showDetail 裡已經內建了 speakStory()，所以會自動開始朗讀！）
-  showDetail(story);
-  }
   const groupDiv = document.getElementById(tagId);
   // 若為隱藏狀態則顯示，反之亦然
   if (groupDiv.style.display === 'none') {
@@ -130,6 +114,31 @@ async function openStoryFromOverview(storyId) {
   } else {
     groupDiv.style.display = 'none';
   }
+}
+
+// 🔥 新增：從總覽表點擊故事時的處理函式（必須獨立放在外面！）
+async function openStoryFromOverview(storyId) {
+  const story = globalStoriesMap[storyId];
+  if (!story) return;
+
+  // 1. 關閉總覽彈出視窗
+  toggleOverview();
+
+  // 🔥 關鍵修復 1：在等待網路抓資料前，立刻送出無聲指令解鎖瀏覽器語音權限
+  if ('speechSynthesis' in window) {
+    const unlockAudio = new SpeechSynthesisUtterance('');
+    unlockAudio.volume = 0;
+    window.speechSynthesis.speak(unlockAudio);
+  }
+
+  // 2. 切換縣市
+  if (currentCountyId !== story.countyId) {
+    // 傳入 true，告訴 selectCounty「不要清空畫面跟中斷語音」
+    await selectCounty(story.countyId, story.countyName || '未知', true);
+  }
+
+  // 3. 展開故事詳情並開始朗讀
+  showDetail(story);
 }
 
 
@@ -240,7 +249,7 @@ function hideTooltip() {
 }
 
 // ── 選擇縣市 ──
-async function selectCounty(id, name) {
+async function selectCounty(id, name, preventClear = false) {
   if (rankingMode) {
     rankingMode = false;
     $('rankBtn').textContent = '👁 排行';
@@ -265,7 +274,10 @@ async function selectCounty(id, name) {
 
   renderTags();
   renderStoryList(currentStories);
+// 🔥 關鍵修改：如果是從總覽跳過來的（preventClear 為 true），就不要清空畫面跟中斷語音！
+  if (!preventClear) {
   clearDetail();
+}
 }
 
 // ── 標籤篩選 ──
