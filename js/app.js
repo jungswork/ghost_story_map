@@ -488,7 +488,7 @@ function toggleSubmitForm() {
   }
 }
 
-// 處理表單送出（透過 Formspree 寄信給開發者）
+// 處理表單送出（透過 Web3Forms 寄信給開發者）
 async function submitNewStory(event) {
   event.preventDefault();
   const btn = document.getElementById('formSubmitBtn');
@@ -518,21 +518,29 @@ async function submitNewStory(event) {
   // 組成讓開發者可直接複製的 JSON 字串
   const jsonPreview = JSON.stringify(storyData, null, 2);
 
-  // Formspree payload：每個欄位都會顯示在 email 中
+  // Web3Forms payload
   const payload = {
-    _subject:    `【新投稿】${storyData.title}（${countyName}）`,
-    縣市:        countyName,
-    標題:        storyData.title,
-    分類:        storyData.tag,
-    恐怖指數:    storyData.scaryLevel,
-    地點:        storyData.location.display,
-    摘要:        storyData.summary,
-    內文:        storyData.content,
-    '--- JSON（直接複製貼入 ghost_story/）---': jsonPreview
+    access_key: '8352f00e-7b65-4d7d-933f-9631c1e709ed',
+    subject:    `【新投稿】${storyData.title}（${countyName}）`,
+    from_name:  '台灣鬼事地圖投稿系統',
+    message:    [
+      `縣市：${countyName}`,
+      `標題：${storyData.title}`,
+      `分類：${storyData.tag}`,
+      `恐怖指數：${storyData.scaryLevel}`,
+      `地點：${storyData.location.display}`,
+      `摘要：${storyData.summary}`,
+      ``,
+      `內文：`,
+      storyData.content,
+      ``,
+      `--- JSON（直接複製貼入 ghost_story/）---`,
+      jsonPreview
+    ].join('\n')
   };
 
   try {
-    const res = await fetch('https://formspree.io/f/mqeolkzo', {
+    const res = await fetch('https://api.web3forms.com/submit', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body:    JSON.stringify(payload)
@@ -540,12 +548,13 @@ async function submitNewStory(event) {
 
     const result = await res.json();
 
-    if (result.ok) {
+    if (result.success) {
       alert('📜 靈異卷軸已送出！\n待開發者審核通過後即會出現在地圖上，感謝你的投稿。');
       document.getElementById('submitForm').reset();
       toggleSubmitForm();
+      allStoriesCache = null;
     } else {
-      alert('⚠ 投稿失敗：' + (result.error || '未知錯誤'));
+      alert('⚠ 投稿失敗：' + (result.message || '未知錯誤'));
     }
   } catch (error) {
     console.error('送出錯誤:', error);
