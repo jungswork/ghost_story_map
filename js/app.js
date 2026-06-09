@@ -49,7 +49,7 @@ async function loadOverviewData() {
 
     let htmlContent = '<div class="overview-categories">';
     
-    // 針對每個分類標籤迭代
+// 針對每個分類標籤迭代
     for (const [tag, stories] of Object.entries(groupedStories)) {
       // 幫每個 tag 產生一個安全的 HTML ID（去除空格等）
       const safeTagId = 'tag-' + tag.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '-');
@@ -62,7 +62,6 @@ async function loadOverviewData() {
             <span class="tag-count">(${stories.length} 則檔案) ▾</span>
           </button>
           
-          <!-- 預設隱藏的內容區塊 (display: none) -->
           <div class="overview-stories" id="${safeTagId}" style="display: none;">
             <table class="overview-table">
               <thead>
@@ -76,11 +75,10 @@ async function loadOverviewData() {
               <tbody>
       `;
       
-// 生成該分類下的故事
+      // 生成該分類下的故事
       stories.forEach(s => {
         const skulls = '☠'.repeat(s.scaryLevel || 1) + '－'.repeat(5 - (s.scaryLevel || 1));
         
-        // 🔥 2. 在 tr 加上 onclick 事件與滑鼠指標樣式 (cursor: pointer)
         htmlContent += `
                 <tr style="cursor: pointer; transition: background 0.3s;" 
                     onclick="openStoryFromOverview('${s.id}')" 
@@ -93,7 +91,15 @@ async function loadOverviewData() {
                 </tr>
         `;
       });
-    }
+      
+      // 🔥🔥🔥 關鍵修復：在這裡把表格跟外框關起來，確保下一個分類不會被吃掉！ 🔥🔥🔥
+      htmlContent += `
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    } // for 迴圈結束
     
     htmlContent += '</div>';
     container.innerHTML = htmlContent;
