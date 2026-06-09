@@ -438,3 +438,80 @@ function updateSoundUI() {
   $('soundLabel').textContent = isPlaying ? '靈異氛圍：啟動中' : '開啟靈異氛圍音效';
   btn.classList.toggle('on', isPlaying);
 }
+
+// ── 投稿功能 ──
+
+// 切換投稿表單顯示/隱藏
+function toggleSubmitForm() {
+  const modal = document.getElementById('submitModal');
+  if (modal.style.display === 'none' || modal.style.display === '') {
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    // 如果縣市選單還是空的，從 mapData 抓取並自動填入
+    const select = document.getElementById('formCounty');
+    if (select.options.length <= 1) {
+      fetch_json('/api/map-data').then(data => {
+        data.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = c.name;
+          select.appendChild(opt);
+        });
+      });
+    }
+  } else {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+}
+
+// 處理表單送出
+async function submitNewStory(event) {
+  event.preventDefault(); // 阻止網頁預設的重新整理行為
+  const btn = document.getElementById('formSubmitBtn');
+  btn.textContent = '傳送中...';
+  btn.disabled = true;
+
+  // 收集表單資料
+  const payload = {
+    countyId: document.getElementById('formCounty').value,
+    title: document.getElementById('formTitle').value,
+    tag: document.getElementById('formTag').value,
+    scaryLevel: document.getElementById('formScary').value,
+    location: document.getElementById('formLoc').value,
+    summary: document.getElementById('formSummary').value,
+    content: document.getElementById('formContent').value
+  };
+
+  try {
+    const res = await fetch('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    
+    const result = await res.json();
+    
+    if (result.success) {
+      alert('📜 靈異卷軸已成功封印進地圖中！\n感謝你的投稿。');
+      document.getElementById('submitForm').reset(); // 清空表單
+      toggleSubmitForm(); // 關閉視窗
+      
+      // 重新載入地圖與資料，讓新故事立刻出現
+      isOverviewLoaded = false; 
+      init(); 
+      if (currentCountyId === payload.countyId) {
+        selectCounty(payload.countyId, document.getElementById('formCounty').selectedOptions[0].text, true);
+      }
+    } else {
+      alert('⚠ 投稿失敗：' + result.error);
+    }
+  } catch (error) {
+    console.error('送出錯誤:', error);
+    alert('⚠ 陰陽交界連線中斷，請稍後再試。');
+  } finally {
+    btn.textContent = '🩸 封印進地圖 (送出)';
+    btn.disabled = false;
+  }
+}

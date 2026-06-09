@@ -20,6 +20,9 @@
     </div>
   </div>
   <div class="header-right">
+    <button class="btn-sound" id="submitModalBtn" onclick="toggleSubmitForm()">
+    <span>📝</span> 投稿異事
+    </button>
     <!-- 新增的分類總覽按鈕 -->
     <button class="btn-sound" id="overviewBtn" onclick="toggleOverview()">
     <span>📋</span> 分類總覽
@@ -106,6 +109,50 @@
     </div>
     <div id="overviewContainer">
       <p style="text-align: center;">靈異卷軸展開中...</p>
+    </div>
+  </div>
+</div>
+
+<div id="submitModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content" style="max-width: 600px; height: auto; max-height: 90vh;">
+    <div class="modal-header">
+      <div class="modal-title">📝 撰寫靈異卷軸 (匿名投稿)</div>
+      <button class="close-btn" onclick="toggleSubmitForm()">✖ 關閉</button>
+    </div>
+    <div style="padding: 20px; overflow-y: auto;">
+      <form id="submitForm" onsubmit="submitNewStory(event)" class="ghost-form">
+        <div class="form-group">
+          <label>發生縣市</label>
+          <select id="formCounty" required>
+            <option value="">請選擇縣市...</option>
+            </select>
+        </div>
+        <div class="form-group">
+          <label>故事標題</label>
+          <input type="text" id="formTitle" required placeholder="例如：紅衣小女孩的低語">
+        </div>
+        <div class="form-group">
+          <label>分類標籤</label>
+          <input type="text" id="formTag" required placeholder="例如：都市傳說、校園奇譚、荒野魅影">
+        </div>
+        <div class="form-group">
+          <label>驚嚇指數 (1-5)</label>
+          <input type="number" id="formScary" min="1" max="5" value="3" required>
+        </div>
+        <div class="form-group">
+          <label>具體地點</label>
+          <input type="text" id="formLoc" placeholder="例如：台中市大坑山區">
+        </div>
+        <div class="form-group">
+          <label>一句話摘要</label>
+          <input type="text" id="formSummary" required placeholder="簡短描述這個故事的恐怖之處">
+        </div>
+        <div class="form-group">
+          <label>故事內文</label>
+          <textarea id="formContent" rows="6" required placeholder="請詳細描述事件發生的經過..."></textarea>
+        </div>
+        <button type="submit" class="submit-btn" id="formSubmitBtn">🩸 封印進地圖 (送出)</button>
+      </form>
     </div>
   </div>
 </div>

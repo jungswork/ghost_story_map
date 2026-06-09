@@ -26,6 +26,7 @@
 # ============================================================
 
 import json
+import uuid # 🔥 新增：用來產生隨機的故事 ID
 from pathlib import Path
 from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
@@ -137,7 +138,47 @@ def get_stats():
         "county_count":   len(stories),
         "county_counts":  {cid: len(sl) for cid, sl in stories.items()},
     })
+# 提供前端投稿新故事使用
+@app.route("/api/submit", methods=["POST"])
+def submit_story():
+    """接收前端表單，自動產生 ID 並存入 ghost_story/ 資料夾"""
+    try:
+        data = request.get_json()
+        
+        # 基本欄位驗證
+        if not data or not data.get("title") or not data.get("countyId"):
+            return jsonify({"success": False, "error": "缺少必填欄位"}), 400
 
+        # 產生獨一無二的檔案 ID (例如: user-a1b2c3d4)
+        story_id = f"user-{uuid.uuid4().hex[:8]}"
+        
+        # 依照你原本的 JSON 格式建立新字典
+        new_story = {
+            "id": story_id,
+            "countyId": data.get("countyId"),
+            "title": data.get("title"),
+            "tag": data.get("tag", "未分類"),
+            "scaryLevel": int(data.get("scaryLevel", 1)),
+            "summary": data.get("summary", ""),
+            "location": {
+                "display": data.get("location", "未知"),
+                "district": "",
+                "lat": None,
+                "lng": None
+            },
+            "content": data.get("content", "")
+        }
+
+        # 將資料寫入 ghost_story 資料夾
+        file_path = STORY_DIR / f"{story_id}.json"
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(new_story, f, ensure_ascii=False, indent=2)
+
+        return jsonify({"success": True, "id": story_id})
+    
+    except Exception as e:
+        print(f"⚠ 投稿寫入失敗: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
 # ── 啟動 ─────────────────────────────────────────────────────
 if __name__ == "__main__":

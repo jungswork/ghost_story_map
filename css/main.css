@@ -300,3 +300,55 @@ footer p + p { margin-top: 2px; opacity: .55; }
   padding: 15px;
   background: rgba(0, 0, 0, 0.3);
 }
+
+/* 投稿表單樣式 */
+.ghost-form .form-group {
+  margin-bottom: 15px;
+}
+
+.ghost-form label {
+  display: block;
+  color: var(--dim);
+  margin-bottom: 5px;
+  font-size: 0.95rem;
+}
+
+.ghost-form input, 
+.ghost-form select, 
+.ghost-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.ghost-form input:focus, 
+.ghost-form select:focus, 
+.ghost-form textarea:focus {
+  outline: none;
+  border-color: var(--red);
+  background: rgba(220, 38, 38, 0.05);
+}
+
+.submit-btn {
+  width: 100%;
+  background: rgba(220, 38, 38, 0.2);
+  color: var(--red);
+  border: 1px solid var(--red);
+  padding: 12px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.submit-btn:hover {
+  background: var(--red);
+  color: #fff;
+  letter-spacing: 2px;
+}
