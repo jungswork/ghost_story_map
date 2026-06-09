@@ -6,6 +6,95 @@ let selectedTag     = null;
 let countyCountMap  = {};
 let audio           = null;
 let isPlaying       = false;
+let isOverviewLoaded = false;
+
+// 切換總覽表顯示/隱藏
+async function toggleOverview() {
+  const modal = document.getElementById('overviewModal');
+  
+  if (modal.style.display === 'none') {
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // 鎖定背景滾動
+    
+    // 如果尚未載入過資料，則進行 Fetch
+    if (!isOverviewLoaded) {
+      await loadOverviewData();
+    }
+  } else {
+    modal.style.display = 'none';
+    document.body.style.overflow = ''; // 恢復背景滾動
+  }
+}
+
+// 獲取資料並渲染分類表格
+async function loadOverviewData() {
+  const container = document.getElementById('overviewContainer');
+  
+  try {
+    const res = await fetch('/api/stories');
+    if (!res.ok) throw new Error('Network response was not ok');
+    const allStories = await res.json();
+    
+    // 依據 tag 分組
+    const groupedStories = {};
+    allStories.forEach(story => {
+      const tag = story.tag || '未分類';
+      if (!groupedStories[tag]) {
+        groupedStories[tag] = [];
+      }
+      groupedStories[tag].push(story);
+    });
+
+    // 依據分類生成 HTML 表格
+    let htmlContent = '';
+    
+    // 針對每個分類標籤迭代
+    for (const [tag, stories] of Object.entries(groupedStories)) {
+      htmlContent += `
+        <div class="overview-tag-section">
+          <div class="overview-tag-title">🏷 ${tag} <span style="color:var(--dim); font-size:0.9rem;">(${stories.length} 則)</span></div>
+          <table class="overview-table">
+            <thead>
+              <tr>
+                <th width="15%">發生縣市</th>
+                <th width="25%">故事標題</th>
+                <th width="45%">一句話摘要</th>
+                <th width="15%">驚嚇指數</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      stories.forEach(s => {
+        // 驚嚇指數轉為骷髏頭符號
+        const skulls = '☠'.repeat(s.scaryLevel || 1) + '－'.repeat(5 - (s.scaryLevel || 1));
+        
+        htmlContent += `
+              <tr>
+                <td>${s.countyName || '未知'}</td>
+                <td><strong style="color:var(--red);">${s.title}</strong></td>
+                <td style="color:var(--dim);">${s.summary}</td>
+                <td style="letter-spacing:2px; font-size:0.8rem;">${skulls}</td>
+              </tr>
+        `;
+      });
+      
+      htmlContent += `
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+    
+    container.innerHTML = htmlContent;
+    isOverviewLoaded = true;
+
+  } catch (error) {
+    console.error("載入總覽資料失敗:", error);
+    container.innerHTML = `<p style="color:var(--red); text-align:center;">⚠ 陰陽交界連線中斷，無法讀取資料...</p>`;
+  }
+}
+
 
 // ── 工具函式 ──
 const $ = id => document.getElementById(id);

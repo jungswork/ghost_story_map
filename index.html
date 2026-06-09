@@ -20,6 +20,11 @@
     </div>
   </div>
   <div class="header-right">
+    <!-- 新增的分類總覽按鈕 -->
+    <button class="btn-sound" id="overviewBtn" onclick="toggleOverview()">
+    <span>📋</span> 分類總覽
+    </button>
+
     <button class="btn-sound" id="soundBtn" onclick="toggleSound()">
       <span id="soundIcon">🔇</span>
       <span id="soundLabel">開啟靈異氛圍音效</span>
@@ -91,6 +96,19 @@
     </div>
   </div>
 </main>
+
+<!-- 分類總覽彈出視窗 (預設隱藏) -->
+<div id="overviewModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">📂 靈異傳說分類總覽</div>
+      <button class="close-btn" onclick="toggleOverview()">✖ 關閉</button>
+    </div>
+    <div id="overviewContainer">
+      <p style="text-align: center;">靈異卷軸展開中...</p>
+    </div>
+  </div>
+</div>
 
 <footer>
   <p>© 2026 台灣鬼事地圖｜傳統民俗與都市傳說學術考證</p>
