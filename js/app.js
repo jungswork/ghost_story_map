@@ -10,6 +10,21 @@ let isOverviewLoaded = false;
 
 // 切換總覽表顯示/隱藏
 async function toggleOverview() {
+  const modal = document.getElementById('overviewModal');
+  
+  if (modal.style.display === 'none' || modal.style.display === '') {
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // 鎖定背景滾動
+    
+    // 如果尚未載入過資料，則進行 Fetch
+    if (!isOverviewLoaded) {
+      await loadOverviewData();
+    }
+  } else {
+    modal.style.display = 'none';
+    document.body.style.overflow = ''; // 恢復背景滾動
+  }
+}
 // 獲取資料並渲染分類折疊列表
 async function loadOverviewData() {
   const container = document.getElementById('overviewContainer');
