@@ -10,23 +10,7 @@ let isOverviewLoaded = false;
 
 // 切換總覽表顯示/隱藏
 async function toggleOverview() {
-  const modal = document.getElementById('overviewModal');
-  
-  if (modal.style.display === 'none') {
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden'; // 鎖定背景滾動
-    
-    // 如果尚未載入過資料，則進行 Fetch
-    if (!isOverviewLoaded) {
-      await loadOverviewData();
-    }
-  } else {
-    modal.style.display = 'none';
-    document.body.style.overflow = ''; // 恢復背景滾動
-  }
-}
-
-// 獲取資料並渲染分類表格
+// 獲取資料並渲染分類折疊列表
 async function loadOverviewData() {
   const container = document.getElementById('overviewContainer');
   
@@ -45,53 +29,75 @@ async function loadOverviewData() {
       groupedStories[tag].push(story);
     });
 
-    // 依據分類生成 HTML 表格
-    let htmlContent = '';
+    let htmlContent = '<div class="overview-categories">';
     
     // 針對每個分類標籤迭代
     for (const [tag, stories] of Object.entries(groupedStories)) {
+      // 幫每個 tag 產生一個安全的 HTML ID（去除空格等）
+      const safeTagId = 'tag-' + tag.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '-');
+      
+      // 生成折疊按鈕 (Button)
       htmlContent += `
-        <div class="overview-tag-section">
-          <div class="overview-tag-title">🏷 ${tag} <span style="color:var(--dim); font-size:0.9rem;">(${stories.length} 則)</span></div>
-          <table class="overview-table">
-            <thead>
-              <tr>
-                <th width="15%">發生縣市</th>
-                <th width="25%">故事標題</th>
-                <th width="45%">一句話摘要</th>
-                <th width="15%">驚嚇指數</th>
-              </tr>
-            </thead>
-            <tbody>
+        <div class="overview-group">
+          <button class="overview-tag-btn" onclick="toggleTagGroup('${safeTagId}')">
+            <span class="tag-icon">📂</span> ${tag}
+            <span class="tag-count">(${stories.length} 則檔案) ▾</span>
+          </button>
+          
+          <!-- 預設隱藏的內容區塊 (display: none) -->
+          <div class="overview-stories" id="${safeTagId}" style="display: none;">
+            <table class="overview-table">
+              <thead>
+                <tr>
+                  <th width="15%">發生縣市</th>
+                  <th width="25%">故事標題</th>
+                  <th width="45%">摘要描述</th>
+                  <th width="15%">驚嚇指數</th>
+                </tr>
+              </thead>
+              <tbody>
       `;
       
+      // 生成該分類下的故事
       stories.forEach(s => {
-        // 驚嚇指數轉為骷髏頭符號
         const skulls = '☠'.repeat(s.scaryLevel || 1) + '－'.repeat(5 - (s.scaryLevel || 1));
         
         htmlContent += `
-              <tr>
-                <td>${s.countyName || '未知'}</td>
-                <td><strong style="color:var(--red);">${s.title}</strong></td>
-                <td style="color:var(--dim);">${s.summary}</td>
-                <td style="letter-spacing:2px; font-size:0.8rem;">${skulls}</td>
-              </tr>
+                <tr>
+                  <td>${s.countyName || '未知'}</td>
+                  <td><strong style="color:var(--red);">${s.title}</strong></td>
+                  <td style="color:var(--dim);">${s.summary}</td>
+                  <td style="letter-spacing:2px; font-size:0.8rem;">${skulls}</td>
+                </tr>
         `;
       });
       
       htmlContent += `
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
         </div>
       `;
     }
     
+    htmlContent += '</div>';
     container.innerHTML = htmlContent;
     isOverviewLoaded = true;
 
   } catch (error) {
     console.error("載入總覽資料失敗:", error);
     container.innerHTML = `<p style="color:var(--red); text-align:center;">⚠ 陰陽交界連線中斷，無法讀取資料...</p>`;
+  }
+}
+
+// 點擊分類時：展開或收合該分類的故事列表
+function toggleTagGroup(tagId) {
+  const groupDiv = document.getElementById(tagId);
+  // 若為隱藏狀態則顯示，反之亦然
+  if (groupDiv.style.display === 'none') {
+    groupDiv.style.display = 'block';
+  } else {
+    groupDiv.style.display = 'none';
   }
 }
 

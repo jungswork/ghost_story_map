@@ -253,3 +253,48 @@ footer p + p { margin-top: 2px; opacity: .55; }
 .overview-table tr:hover td {
   background: rgba(220, 38, 38, 0.05);
 }
+
+/* --- 分類折疊按鈕樣式 --- */
+.overview-group {
+  margin-bottom: 10px;
+}
+
+.overview-tag-btn {
+  width: 100%;
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid var(--border); /* 使用原本的邊框變數 */
+  color: var(--text); /* 使用原本的文字變數 */
+  padding: 15px 20px;
+  text-align: left;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.overview-tag-btn:hover {
+  background: rgba(220, 38, 38, 0.3);
+  border-color: var(--red);
+}
+
+.overview-tag-btn .tag-icon {
+  margin-right: 10px;
+  color: var(--red);
+}
+
+.overview-tag-btn .tag-count {
+  margin-left: auto; /* 讓數量靠右對齊 */
+  color: var(--dim);
+  font-size: 0.95rem;
+  font-weight: normal;
+}
+
+/* 展開後的故事區塊外框 */
+.overview-stories {
+  border: 1px solid var(--border);
+  border-top: none;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.3);
+}
